@@ -1,3 +1,4 @@
+import FormInput from "@components/Form/FormInput";
 import { rules } from "@utils/rules";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router";
@@ -22,66 +23,54 @@ const Register = () => {
     console.log(data);
   });
 
+
   return (
     <div className="ml-auto bg-white p-8 lg:w-[400px]">
       <div className="hidden lg:block lg:text-2xl">Đăng nhập</div>
       <form onSubmit={onSubmit}>
-        <div className="mt-6">
-          <input
-            type="text"
-            placeholder="Name"
-            className="h-10 w-full rounded border border-gray-400"
-            {...register("name", rules.required("tên"))}
-          />
+        <FormInput
+          className="mt-6"
+          type="text"
+          placeholder="Name"
+          register={register("name", rules.required("tên"))}
+          error={errors.name}
+        />
 
-          <div className="min-h-[1.5rem] text-red-400">
-            {errors.name?.message}
-          </div>
-        </div>
-        <div className="mt-2">
-          <input
-            type="text"
-            placeholder="Email"
-            className="h-10 w-full rounded border border-gray-400"
-            {...register("email", {
-              ...rules.required("email"),
-              ...rules.mustEmail(),
-            })}
-          />
-          <div className="min-h-[1.5rem] text-red-400">
-            {errors.email?.message}
-          </div>
-        </div>
-        <div className="mt-2">
-          <input
-            type="password"
-            placeholder="Ennter Password"
-            className="h-10 w-full rounded border border-gray-400"
-            {...register("password", rules.required("mật khẩu"))}
-          />
-          <div className="min-h-[1.5rem] text-red-400">
-            {errors.password?.message}
-          </div>
-        </div>
-        <div className="mt-2">
-          <input
-            type="password"
-            placeholder="Confirm Password"
-            className="h-10 w-full rounded border border-gray-400"
-            {...register("confirmPassword", {
-              ...rules.required("xác nhận mật khẩu"),
-              validate: (value) => {
-                const password = getValues("password");
-                if (password !== value) {
-                  return "mật khẻ không khợp";
-                }
-              },
-            })}
-          />
-        </div>
-        <div className="min-h-[1.5rem] text-red-400">
-          {errors.confirmPassword?.message}
-        </div>
+        <FormInput
+          type="text"
+          placeholder="Email"
+          register={register("email", {
+            ...rules.required("email"),
+            ...rules.mustEmail(),
+          })}
+          error={errors.email}
+        />
+
+        <FormInput
+          type="password"
+          placeholder="Mật khẩu"
+          register={register("password", {
+            ...rules.required("mật khẩu"),
+          })}
+          error={errors.password}
+        />
+
+        <FormInput
+          type="password"
+          placeholder="Xác nhận mật khẩu"
+          error={errors.confirmPassword}
+          register={register("confirmPassword", {
+            ...rules.required("xác nhận khẩu"),
+
+            validate: (value) => {
+              const password = getValues("password");
+              if (password !== value) {
+                return "mật khẻ không khợp";
+              }
+            },
+          })}
+        />
+
         <div>
           <button className="curshadow mt-7 w-full cursor-pointer rounded bg-[#EE4D2D] p-2 hover:bg-orange-500">
             Đăng ký

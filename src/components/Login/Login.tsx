@@ -1,26 +1,48 @@
+import FormInput from "@components/Form/FormInput";
+import { rules } from "@utils/rules";
+import { useForm } from "react-hook-form";
 import { Link } from "react-router";
 
+interface LoginForm {
+  email: string;
+  password: string;
+}
+
 const Login = () => {
+  const {
+    register,
+    handleSubmit,
+
+    formState: { errors },
+  } = useForm<LoginForm>({
+    mode: "onChange",
+  });
+
+  const onSubmit = handleSubmit((data) => {
+    console.log(data);
+  });
   return (
     <div className="ml-auto h-[500px] bg-white p-8 lg:w-[400px]">
-      <div className="hidden lg:block lg:text-2xl">Đăng nhập</div>
-      <form>
-        <div className="mt-6">
-          <input
-            type="email"
-            placeholder="Email"
-            className="h-10 w-full rounded border border-gray-400"
-          />
-          <div className="max-h-1 text-red-400"> Sai email</div>
-        </div>
-        <div className="mt-6">
-          <input
-            type="password"
-            placeholder="Ennter Password"
-            className="h-10 w-full rounded border border-gray-400"
-          />
-          <div className="max-h-1 text-red-400"> Sai passoword</div>
-        </div>
+      <div className="hidden pb-2 lg:block lg:text-2xl">Đăng nhập</div>
+      <form onSubmit={onSubmit}>
+        <FormInput
+          type="text"
+          placeholder="Email"
+          register={register("email", {
+            ...rules.required("email"),
+            ...rules.mustEmail(),
+          })}
+          error={errors.email}
+        />
+
+        <FormInput
+          type="password"
+          placeholder="Mật khẩu"
+          register={register("password", {
+            ...rules.required("mật khẩu"),
+          })}
+          error={errors.password}
+        />
 
         <div>
           <button className="curshadow mt-7 w-full cursor-pointer rounded bg-[#EE4D2D] p-2 hover:bg-orange-500">
