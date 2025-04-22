@@ -1,43 +1,87 @@
+import { rules } from "@utils/rules";
+import { useForm } from "react-hook-form";
 import { Link } from "react-router";
 
+interface RegisterForm {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
 const Register = () => {
+  const {
+    register,
+    handleSubmit,
+    getValues,
+    formState: { errors },
+  } = useForm<RegisterForm>({
+    mode: "onChange",
+  });
+
+  const onSubmit = handleSubmit((data) => {
+    console.log(data);
+  });
+
   return (
     <div className="ml-auto bg-white p-8 lg:w-[400px]">
       <div className="hidden lg:block lg:text-2xl">Đăng nhập</div>
-      <form>
+      <form onSubmit={onSubmit}>
         <div className="mt-6">
           <input
             type="text"
             placeholder="Name"
             className="h-10 w-full rounded border border-gray-400"
+            {...register("name", rules.required("tên"))}
           />
-          <div className="max-h-1 text-red-400"> Sai Tên</div>
+
+          <div className="min-h-[1.5rem] text-red-400">
+            {errors.name?.message}
+          </div>
         </div>
-        <div className="mt-6">
+        <div className="mt-2">
           <input
-            type="email"
+            type="text"
             placeholder="Email"
             className="h-10 w-full rounded border border-gray-400"
+            {...register("email", {
+              ...rules.required("email"),
+              ...rules.mustEmail(),
+            })}
           />
-          <div className="max-h-1 text-red-400"> Sai email</div>
+          <div className="min-h-[1.5rem] text-red-400">
+            {errors.email?.message}
+          </div>
         </div>
-        <div className="mt-6">
+        <div className="mt-2">
           <input
             type="password"
             placeholder="Ennter Password"
             className="h-10 w-full rounded border border-gray-400"
+            {...register("password", rules.required("mật khẩu"))}
           />
-          <div className="max-h-1 text-red-400"> Sai passoword</div>
+          <div className="min-h-[1.5rem] text-red-400">
+            {errors.password?.message}
+          </div>
         </div>
-        <div className="mt-6">
+        <div className="mt-2">
           <input
             type="password"
             placeholder="Confirm Password"
             className="h-10 w-full rounded border border-gray-400"
+            {...register("confirmPassword", {
+              ...rules.required("xác nhận mật khẩu"),
+              validate: (value) => {
+                const password = getValues("password");
+                if (password !== value) {
+                  return "mật khẻ không khợp";
+                }
+              },
+            })}
           />
-          <div className="max-h-1 text-red-400"> Sai passoword</div>
         </div>
-
+        <div className="min-h-[1.5rem] text-red-400">
+          {errors.confirmPassword?.message}
+        </div>
         <div>
           <button className="curshadow mt-7 w-full cursor-pointer rounded bg-[#EE4D2D] p-2 hover:bg-orange-500">
             Đăng ký
@@ -76,7 +120,7 @@ const Register = () => {
       </div>
       <div className="mt-2 text-sm lg:mt-5 lg:text-center">
         Bạn đã có tài khoản ?{" "}
-        <Link to={"/lgoin"} className="cursor-pointer text-[#EE4D2D]">
+        <Link to={"/login"} className="cursor-pointer text-[#EE4D2D]">
           Đăng nhập
         </Link>
       </div>
