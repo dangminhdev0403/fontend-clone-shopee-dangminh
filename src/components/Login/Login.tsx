@@ -1,9 +1,11 @@
 import FormInput from "@components/Form/FormInput";
+import { instance } from "@service/axios.custom";
+import { ApiError } from "@utils/custom.errors";
 import { rules } from "@utils/rules";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router";
 
-interface LoginForm {
+interface UserLogin {
   email: string;
   password: string;
 }
@@ -14,15 +16,23 @@ const Login = () => {
     handleSubmit,
 
     formState: { errors },
-  } = useForm<LoginForm>({
+  } = useForm<UserLogin>({
     mode: "onChange",
   });
 
-  const onSubmit = handleSubmit((data) => {
-    console.log(data);
+  const onSubmit = handleSubmit(async (data: UserLogin) => {
+    try {
+      const res = await instance.get("/users");
+      console.log("res:", res);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        console.log(error.message); // 👈 Có status
+      }
+    }
   });
+
   return (
-    <div className="ml-auto h-[500px] bg-white p-8 lg:w-[400px]">
+    <div className="mr-40 ml-auto h-[500px] bg-white p-8 lg:w-[400px]">
       <div className="hidden pb-2 lg:block lg:text-2xl">Đăng nhập</div>
       <form onSubmit={onSubmit}>
         <FormInput

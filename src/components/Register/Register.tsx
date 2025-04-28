@@ -23,9 +23,8 @@ const Register = () => {
     console.log(data);
   });
 
-
   return (
-    <div className="ml-auto bg-white p-8 lg:w-[400px]">
+    <div className="mr-40 ml-auto bg-white p-8 lg:w-[400px]">
       <div className="hidden lg:block lg:text-2xl">Đăng nhập</div>
       <form onSubmit={onSubmit}>
         <FormInput
@@ -65,7 +64,7 @@ const Register = () => {
             validate: (value) => {
               const password = getValues("password");
               if (password !== value) {
-                return "mật khẻ không khợp";
+                return "Mật khẩu không khớp";
               }
             },
           })}

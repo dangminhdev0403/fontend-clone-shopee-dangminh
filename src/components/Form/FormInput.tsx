@@ -9,8 +9,6 @@ interface FormInputProps {
 }
 
 const FormInput = ({ ...props }: FormInputProps) => {
-  console.log(props.placeholder, props.error);
-
   return (
     <div className={props.className ?? "mt-2"}>
       <input
