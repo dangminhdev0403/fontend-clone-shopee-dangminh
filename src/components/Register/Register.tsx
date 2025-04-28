@@ -24,7 +24,7 @@ const Register = () => {
   });
 
   return (
-    <div className="mr-40 ml-auto bg-white p-8 lg:w-[400px]">
+    <div className="ml-auto bg-white p-8 lg:mr-40 lg:w-[400px]">
       <div className="hidden lg:block lg:text-2xl">Đăng nhập</div>
       <form onSubmit={onSubmit}>
         <FormInput

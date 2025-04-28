@@ -5,6 +5,8 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router-dom";
+import { Bounce, ToastContainer } from "react-toastify";
+
 import App from "./App.tsx";
 import "./index.css";
 
@@ -25,5 +27,18 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <RouterProvider router={router} />
+    <ToastContainer
+      position="top-right"
+      autoClose={2000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover={false}
+      theme="light"
+      transition={Bounce}
+    />
   </StrictMode>,
 );

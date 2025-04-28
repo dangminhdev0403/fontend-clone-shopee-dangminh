@@ -1,5 +1,4 @@
 import { ApiError } from "@utils/custom.errors";
-import { ApiResponseDefault } from "@utils/response";
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 
 type DetailError = {
@@ -26,9 +25,8 @@ instance.interceptors.request.use(
 
 // Response interceptor
 instance.interceptors.response.use(
-  function (response: AxiosResponse<ApiResponseDefault>) {
-    console.log(response.data.message);
-    return Promise.resolve(response); // Ensure it returns a Promise of AxiosResponse.
+  function (response: AxiosResponse<AxiosResponse>) {
+    return Promise.resolve(response.data); // Ensure it returns a Promise of AxiosResponse.
   },
   function (error: AxiosError) {
     let detailError: DetailError = {};
