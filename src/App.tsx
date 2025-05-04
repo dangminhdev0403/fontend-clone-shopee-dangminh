@@ -1,11 +1,7 @@
 import RootLayout from "@layouts/RootLayout";
 
 const App = () => {
-  return (
-    <div>
-      <RootLayout />
-    </div>
-  );
+  return <RootLayout />;
 };
 
 export default App;

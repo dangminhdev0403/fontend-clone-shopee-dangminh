@@ -4,15 +4,15 @@ import { Outlet } from "react-router";
 
 const Auth = () => {
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <AuthHeader />
 
-      <div className="bg-[#EE4D2D] p-15 lg:p-20">
+      <main className="flex-1 bg-[#EE4D2D] px-6 py-10 lg:px-20">
         <Outlet />
-      </div>
+      </main>
 
       <Footer />
-    </>
+    </div>
   );
 };
 

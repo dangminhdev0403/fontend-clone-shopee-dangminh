@@ -1,7 +1,7 @@
 const Footer = () => {
   return (
-    <footer className="w-full">
-      <div className="bg-[ #f5f5f5] lg:flex lg:justify-between lg:px-[156px]">
+    <footer className="w-full bg-[#a54646]">
+      <div className="lg:flex lg:justify-between lg:px-[156px]">
         <div className="text-center">
           © 2025 Shopee. Tất cả các quyền được bảo lưu.
         </div>
