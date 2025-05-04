@@ -7,7 +7,7 @@ const AuthHeader = () => {
 
   return (
     <header className="max-w-6xl lg:max-w-full">
-      <nav className="flex w-full items-center justify-between px-2 py-2.5 lg:px-40">
+      <nav className="flex w-full items-center justify-between px-2 py-2.5 pb-7 lg:px-40">
         <div className="flex items-end justify-center">
           <svg viewBox="0 0 192 65" className="w-36 fill-[#EE4D2D]">
             <g fillRule="evenodd">
