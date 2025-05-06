@@ -20,7 +20,7 @@ import { NavLink } from "react-router";
 const Header = () => {
   const [query, setQuery] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Tìm kiếm:", query);
     // Thực hiện tìm kiếm tại đây
@@ -86,7 +86,7 @@ const Header = () => {
               <button
                 type="submit"
                 title="Search"
-                className="flex items-center justify-center border-4 border-white bg-[#f53d2d] px-4 text-white transition hover:opacity-90"
+                className="flex cursor-pointer items-center justify-center border-4 border-white bg-[#f53d2d] px-4 text-white transition hover:opacity-90"
               >
                 <FiSearch size={15} />
               </button>
