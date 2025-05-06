@@ -1,4 +1,4 @@
-import FormInput from "@components/Form/FormInput";
+import FormInput from "@components/Form/InputText/FormInput";
 import { apiLogin } from "@service/api.service";
 import { rules } from "@utils/rules";
 import { useForm } from "react-hook-form";
