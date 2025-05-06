@@ -1,9 +1,10 @@
 import FormInput from "@components/Form/FormInput";
+import { apiRegister } from "@service/api.service";
 import { rules } from "@utils/rules";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
-interface RegisterForm {
+export interface RegisterForm {
   name: string;
   email: string;
   password: string;
@@ -13,19 +14,24 @@ const Register = () => {
   const {
     register,
     handleSubmit,
+
+    setError,
     getValues,
     formState: { errors },
   } = useForm<RegisterForm>({
     mode: "onChange",
   });
 
-  const onSubmit = handleSubmit((data) => {
-    console.log(data);
+  const navigate = useNavigate();
+
+  const onSubmit = handleSubmit(async (data) => {
+    const res: boolean = await apiRegister(data, setError);
+    if (res) navigate("/");
   });
 
   return (
     <div className="ml-auto bg-white p-8 lg:mr-40 lg:w-[400px]">
-      <div className="hidden lg:block lg:text-2xl">Đăng nhập</div>
+      <div className="hidden lg:block lg:text-2xl">Đăng Ký</div>
       <form onSubmit={onSubmit}>
         <FormInput
           className="mt-6"

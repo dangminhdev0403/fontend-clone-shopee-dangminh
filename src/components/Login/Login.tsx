@@ -2,7 +2,7 @@ import FormInput from "@components/Form/FormInput";
 import { apiLogin } from "@service/api.service";
 import { rules } from "@utils/rules";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 export interface UserLogin {
   email: string;
@@ -14,13 +14,18 @@ const Login = () => {
     register,
     handleSubmit,
 
+    setError,
+
     formState: { errors },
   } = useForm<UserLogin>({
     mode: "onChange",
   });
 
+  const navigate = useNavigate();
+
   const onSubmit = handleSubmit(async (data: UserLogin) => {
-    await apiLogin(data);
+    const res: boolean = await apiLogin(data, setError);
+    if (res) navigate("/");
   });
 
   return (
@@ -43,7 +48,7 @@ const Login = () => {
           register={register("password", {
             ...rules.required("mật khẩu"),
           })}
-          error={errors.password}
+          error={errors.password} // React hook form -> liệu react hook form có hỗ trợ setError ?
         />
 
         <div>

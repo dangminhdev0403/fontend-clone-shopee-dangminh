@@ -1,3 +1,6 @@
+import { FieldValues, Path, UseFormSetError } from "react-hook-form";
+import { toast } from "react-toastify";
+
 // ApiError.ts
 export class ApiError extends Error {
   status?: number;
@@ -23,3 +26,27 @@ export class ApiError extends Error {
     Object.setPrototypeOf(this, ApiError.prototype);
   }
 }
+
+export const showValidatorMessage = <T extends FieldValues>(
+  error: ApiError,
+  setError: UseFormSetError<T>,
+) => {
+  if (error instanceof ApiError) {
+    const { detailMessage } = error;
+
+    if (Array.isArray(detailMessage)) {
+      detailMessage.forEach((message: Record<string, string>) => {
+        const key = Object.keys(message)[0] as keyof T;
+
+        setError(key as Path<T>, {
+          type: "manual", // ✅ Bắt buộc
+          message: message[key as string],
+        });
+      });
+
+      toast.error("Thao tác thất bại");
+    } else {
+      toast.error(detailMessage as string);
+    }
+  }
+};
