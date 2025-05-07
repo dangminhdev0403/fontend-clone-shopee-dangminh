@@ -1,3 +1,3 @@
-import LanguageDropdown from "@components/Dropdown/LanguageDropdown";
+import DropdownMenu from "@components/Dropdown/DropdownMenu";
 
-export { LanguageDropdown };
+export { DropdownMenu };

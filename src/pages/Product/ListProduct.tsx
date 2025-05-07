@@ -1,4 +1,3 @@
-import { LanguageDropdown } from "@components/Dropdown";
 import { InputCheckBox } from "@components/Form/CheckBox";
 
 const ListProduct = () => {
@@ -9,7 +8,7 @@ const ListProduct = () => {
         <div>
           <h5>Theo danh mục</h5>
           <InputCheckBox />
-          <LanguageDropdown />
+        
         </div>
       </div>
     </section>

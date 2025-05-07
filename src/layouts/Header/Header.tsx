@@ -2,7 +2,7 @@ import { BorderRight } from "@components/Icon";
 import Logo from "@components/Icon/Logo";
 import { FiSearch } from "react-icons/fi";
 
-import { LanguageDropdown } from "@components/Dropdown";
+import { DropdownMenu } from "@components/Dropdown";
 import {
   faFacebook,
   faSquareInstagram,
@@ -12,8 +12,10 @@ import {
   faCartShopping,
   faChevronDown,
   faCircleQuestion,
+  faEarthAsia,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { language, profile } from "@utils/items.dropdown";
 import { useState } from "react";
 import { NavLink } from "react-router";
 
@@ -24,6 +26,10 @@ const Header = () => {
     e.preventDefault();
     console.log("Tìm kiếm:", query);
     // Thực hiện tìm kiếm tại đây
+  };
+
+  const handleChangeLanguege = (item: string) => {
+    console.log("Thay đổi ngôn ngữ" + item);
   };
   return (
     <header className="max-w-6xl bg-[#fb5831] lg:max-w-full">
@@ -58,7 +64,11 @@ const Header = () => {
             Hỗ Trợ
           </NavLink>
           <div className="relative mr-2 pr-2">
-            <LanguageDropdown />
+            <DropdownMenu
+              label="Tiếng Việt"
+              items={language}
+              icon={<FontAwesomeIcon icon={faEarthAsia} />}
+            />
 
             <FontAwesomeIcon icon={faChevronDown} className="ml-1" />
           </div>
@@ -69,14 +79,21 @@ const Header = () => {
             <NavLink to={"/login"}>Đăng Nhập </NavLink>
           </div> */}
           <div className="flex items-center gap-2">
-            <img
-              className="rounded-full"
-              width={22}
-              height={22}
-              src="https://static.vecteezy.com/system/resources/previews/024/183/535/original/male-avatar-portrait-of-a-young-man-with-glasses-illustration-of-male-character-in-modern-color-style-vector.jpg"
-              alt=""
+            <DropdownMenu
+              label="username"
+              items={profile}
+              colorActive={"#00bfa5"}
+              icon={
+                <img
+                  className="rounded-full"
+                  width={22}
+                  height={22}
+                  src="https://static.vecteezy.com/system/resources/previews/024/183/535/original/male-avatar-portrait-of-a-young-man-with-glasses-illustration-of-male-character-in-modern-color-style-vector.jpg"
+                  alt=""
+                />
+              }
+              onItemClick={handleChangeLanguege}
             />
-            <span>username</span>
           </div>
         </div>
       </nav>
