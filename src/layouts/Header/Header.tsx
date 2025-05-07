@@ -27,7 +27,7 @@ const Header = () => {
   };
   return (
     <header className="max-w-6xl bg-[#fb5831] lg:max-w-full">
-      <nav className="flex justify-around pt-1.5 text-sm font-medium text-white">
+      <nav className="hidden justify-around pt-1.5 text-sm font-medium text-white lg:flex">
         <div className="flex gap-1">
           <NavLink to={" "} className="relative mr-2 pr-2">
             Kênh Người Bán <BorderRight />{" "}
@@ -62,13 +62,13 @@ const Header = () => {
             Tiếng Việt
             <FontAwesomeIcon icon={faChevronDown} className="ml-1" />
           </NavLink>
-          <NavLink to={" "} className="relative mr-2 pr-2">
+          <NavLink to={"/register"} className="relative mr-2 pr-2">
             Đăng Ký <BorderRight />{" "}
           </NavLink>
-          <NavLink to={" "}>Đăng Nhập</NavLink>
+          <NavLink to={"/login"}>Đăng Nhập</NavLink>
         </div>
       </nav>
-      <div className="flex w-full items-center justify-between px-2 py-2.5 pb-7 lg:px-40">
+      <div className="flex w-full items-center px-2 py-2.5 pb-7 lg:justify-between lg:px-40">
         <div className="flex w-full items-end justify-center">
           <Logo />
           <div className="mx-auto mt-4 w-full max-w-3xl">
@@ -93,7 +93,7 @@ const Header = () => {
             </form>
           </div>
 
-          <div>
+          <div className="ml-4">
             <FontAwesomeIcon
               icon={faCartShopping}
               className="rounded-full border border-white p-2 text-white"
