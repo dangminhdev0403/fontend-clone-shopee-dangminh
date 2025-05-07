@@ -2,6 +2,7 @@ import { BorderRight } from "@components/Icon";
 import Logo from "@components/Icon/Logo";
 import { FiSearch } from "react-icons/fi";
 
+import { LanguageDropdown } from "@components/Dropdown";
 import {
   faFacebook,
   faSquareInstagram,
@@ -11,7 +12,6 @@ import {
   faCartShopping,
   faChevronDown,
   faCircleQuestion,
-  faGlobe,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
@@ -57,15 +57,27 @@ const Header = () => {
             <FontAwesomeIcon icon={faCircleQuestion} className="mr-1" />
             Hỗ Trợ
           </NavLink>
-          <NavLink to={" "} className="relative mr-2 pr-2">
-            <FontAwesomeIcon icon={faGlobe} className="mr-1" />
-            Tiếng Việt
+          <div className="relative mr-2 pr-2">
+            <LanguageDropdown />
+
             <FontAwesomeIcon icon={faChevronDown} className="ml-1" />
-          </NavLink>
-          <NavLink to={"/register"} className="relative mr-2 pr-2">
-            Đăng Ký <BorderRight />{" "}
-          </NavLink>
-          <NavLink to={"/login"}>Đăng Nhập</NavLink>
+          </div>
+          {/* <div>
+            <NavLink to={"/register"} className="relative mr-2 pr-2">
+              Đăng Ký <BorderRight />{" "}
+            </NavLink>
+            <NavLink to={"/login"}>Đăng Nhập </NavLink>
+          </div> */}
+          <div className="flex items-center gap-2">
+            <img
+              className="rounded-full"
+              width={22}
+              height={22}
+              src="https://static.vecteezy.com/system/resources/previews/024/183/535/original/male-avatar-portrait-of-a-young-man-with-glasses-illustration-of-male-character-in-modern-color-style-vector.jpg"
+              alt=""
+            />
+            <span>username</span>
+          </div>
         </div>
       </nav>
       <div className="flex w-full items-center px-2 py-2.5 pb-7 lg:justify-between lg:px-40">
