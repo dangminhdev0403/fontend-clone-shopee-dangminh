@@ -1,3 +1,3 @@
 import ListProduct from "@pages/Product/ListProduct";
 
-export default ListProduct;
+export { ListProduct as default };
