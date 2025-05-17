@@ -23,7 +23,7 @@ export const filters = [
     },
   },
   {
-    id: "1212313",
+    id: "12112313",
     filter: {
       name: "Nơi bán",
       value: [
@@ -44,7 +44,7 @@ export const products = [
   {
     id: 1,
     img: "https://inoceramic.vn/public/uploads/Sanpham/coc-su-quai-tai-lun-20-coc-su-dep-mau-cam-lsm-n022a.jpg",
-    name: "Sản phẩm1",
+    name: " Sản phẩm siêu hot đang giảm giá sốc, cơ hội cuối cùng để mua được giá rẻ như thế này!",
     price: 100000,
   },
   {
@@ -66,43 +66,43 @@ export const products = [
     price: 100000,
   },
   {
-    id: 5,
+    id: 51,
     img: "https://inoceramic.vn/public/uploads/Sanpham/coc-su-quai-tai-lun-20-coc-su-dep-mau-cam-lsm-n022a.jpg",
     name: "Sản phẩm",
     price: 100000,
   },
   {
-    id: 4,
+    id: 49,
     img: "https://inoceramic.vn/public/uploads/Sanpham/coc-su-quai-tai-lun-20-coc-su-dep-mau-cam-lsm-n022a.jpg",
     name: "Sản phẩm",
     price: 100000,
   },
   {
-    id: 5,
+    id: 15,
     img: "https://inoceramic.vn/public/uploads/Sanpham/coc-su-quai-tai-lun-20-coc-su-dep-mau-cam-lsm-n022a.jpg",
     name: "Sản phẩm",
     price: 100000,
   },
   {
-    id: 4,
+    id: 114,
     img: "https://inoceramic.vn/public/uploads/Sanpham/coc-su-quai-tai-lun-20-coc-su-dep-mau-cam-lsm-n022a.jpg",
     name: "Sản phẩm",
     price: 100000,
   },
   {
-    id: 5,
+    id: 52,
     img: "https://inoceramic.vn/public/uploads/Sanpham/coc-su-quai-tai-lun-20-coc-su-dep-mau-cam-lsm-n022a.jpg",
     name: "Sản phẩm",
     price: 100000,
   },
   {
-    id: 4,
+    id: 45,
     img: "https://inoceramic.vn/public/uploads/Sanpham/coc-su-quai-tai-lun-20-coc-su-dep-mau-cam-lsm-n022a.jpg",
     name: "Sản phẩm",
     price: 100000,
   },
   {
-    id: 5,
+    id: 510,
     img: "https://inoceramic.vn/public/uploads/Sanpham/coc-su-quai-tai-lun-20-coc-su-dep-mau-cam-lsm-n022a.jpg",
     name: "Sản phẩm",
     price: 100000,

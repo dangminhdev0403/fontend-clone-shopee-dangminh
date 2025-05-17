@@ -35,31 +35,29 @@ const Header = () => {
     <header className="max-w-6xl bg-[#fb5831] lg:max-w-full">
       <nav className="hidden justify-around pt-1.5 text-sm font-medium text-white lg:flex">
         <div className="flex gap-1">
-          <NavLink to={" "} className="relative mr-2 pr-2">
+          <NavLink to={"/"} className="relative mr-2 pr-2">
             Kênh Người Bán <BorderRight />{" "}
           </NavLink>
-          <NavLink to={" "} className="relative mr-2 pr-2">
+          <NavLink to={"/sellers"} className="relative mr-2 pr-2">
             Trở thành Người bán Shopee <BorderRight />{" "}
           </NavLink>
-          <NavLink to={" "} className="relative mr-2 pr-2">
+          <NavLink to={"/download"} className="relative mr-2 pr-2">
             Tải ứng dụng <BorderRight />{" "}
           </NavLink>
-          <NavLink to={" "}>
-            Kết nối
-            <NavLink to={""} className={"ml-2"}>
-              <FontAwesomeIcon icon={faFacebook} />{" "}
-            </NavLink>
-            <NavLink to={""} className={"ml-2"}>
-              <FontAwesomeIcon icon={faSquareInstagram} />{" "}
-            </NavLink>
+          <NavLink to={"/connect"}>Kết nối</NavLink>
+          <NavLink to={"/face1"} className={"ml-2"}>
+            <FontAwesomeIcon icon={faFacebook} />{" "}
+          </NavLink>
+          <NavLink to={"/fa1ce"} className={"ml-2"}>
+            <FontAwesomeIcon icon={faSquareInstagram} />{" "}
           </NavLink>
         </div>
         <div className="flex gap-1">
-          <NavLink to={" "} className="relative mr-2 pr-2">
+          <NavLink to={"/noti"} className="relative mr-2 pr-2">
             <FontAwesomeIcon icon={faBell} className="mr-1" />
             Thông báo
           </NavLink>
-          <NavLink to={" "} className="relative mr-2 pr-2">
+          <NavLink to={"/question"} className="relative mr-2 pr-2">
             <FontAwesomeIcon icon={faCircleQuestion} className="mr-1" />
             Hỗ Trợ
           </NavLink>
