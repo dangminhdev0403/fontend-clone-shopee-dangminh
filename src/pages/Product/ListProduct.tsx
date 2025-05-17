@@ -6,7 +6,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ItemProduct from "@pages/Product/ItemProduct";
-import { filters, products, sorts } from "@utils/response";
+import { filters, products, sorts } from "@utils/constants/response";
 
 const ListProduct = () => {
   return (
