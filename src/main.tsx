@@ -1,46 +1,39 @@
-import Login from "@components/Login/Login.tsx";
-import Register from "@components/Register/Register.tsx";
-import Auth from "@pages/Auth/Auth.tsx";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { createBrowserRouter } from "react-router";
+import { Provider } from "react-redux";
 import { RouterProvider } from "react-router-dom";
 import { Bounce, ToastContainer } from "react-toastify";
 
-import ListProduct from "@pages/Product/ListProduct.tsx";
-import { ROUTES } from "@utils/constants/route.ts";
-import App from "./App.tsx";
+import { router } from "@pages/router.tsx";
+import { queryClient } from "@react-query/queryClient";
+import { store } from "@redux/store.ts";
+import { proccess } from "@service/axios.custom";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import "./index.css";
-
-const router = createBrowserRouter([
-  {
-    element: <App />,
-    children: [{ path: ROUTES.HOME, element: <ListProduct /> }],
-  },
-  {
-    element: <Auth />,
-    children: [
-      { path: ROUTES.REGISTER, element: <Register /> },
-      { path: ROUTES.LOGIN, element: <Login /> },
-    ],
-  },
-]);
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
-    <ToastContainer
-      position="top-right"
-      autoClose={2000}
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover={false}
-      theme="light"
-      transition={Bounce}
-    />
+    <Provider store={store}>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+        <ToastContainer
+          position="top-right"
+          autoClose={2000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover={false}
+          theme="light"
+          transition={Bounce}
+        />
+        {proccess.VITE_MODE === "development" && (
+          <ReactQueryDevtools initialIsOpen={false} />
+        )}{" "}
+      </QueryClientProvider>
+    </Provider>
   </StrictMode>,
 );
