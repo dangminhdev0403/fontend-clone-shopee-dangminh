@@ -1,3 +1,4 @@
+import { Button } from "@components/Form/Button";
 import FormInput from "@components/Form/InputText/FormInput";
 import { apiRegister } from "@service/api.service";
 import { rules } from "@utils/rules";
@@ -17,7 +18,7 @@ const Register = () => {
 
     setError,
     getValues,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<RegisterForm>({
     mode: "onChange",
   });
@@ -77,9 +78,7 @@ const Register = () => {
         />
 
         <div>
-          <button className="curshadow mt-7 w-full cursor-pointer rounded bg-[#EE4D2D] p-2 hover:bg-orange-500">
-            Đăng ký
-          </button>
+          <Button title="Đăng Ký" isSubmitting={isSubmitting} />
         </div>
         <div className="divider mt-3.5">
           <span>HOẶC</span>

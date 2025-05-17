@@ -1,3 +1,4 @@
+import { Button } from "@components/Form/Button";
 import FormInput from "@components/Form/InputText/FormInput";
 import { apiLogin } from "@service/api.service";
 import { rules } from "@utils/rules";
@@ -16,7 +17,7 @@ const Login = () => {
 
     setError,
 
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<UserLogin>({
     mode: "onChange",
   });
@@ -52,9 +53,7 @@ const Login = () => {
         />
 
         <div>
-          <button className="curshadow mt-7 w-full cursor-pointer rounded bg-[#EE4D2D] p-2 hover:bg-orange-500">
-            Đăng nhập
-          </button>
+          <Button title="Đăng nhập" isSubmitting={isSubmitting} />
           <div className="mt-2 text-center lg:text-start">Quên mật khẩu ?</div>
         </div>
         <div className="divider">
