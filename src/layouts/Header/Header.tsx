@@ -71,10 +71,10 @@ const Header = () => {
             <FontAwesomeIcon icon={faChevronDown} className="ml-1" />
           </div>
           {/* <div>
-            <NavLink to={"/register"} className="relative mr-2 pr-2">
+            <NavLink to={ROUTES.REGISTER} className="relative mr-2 pr-2">
               Đăng Ký <BorderRight />{" "}
             </NavLink>
-            <NavLink to={"/login"}>Đăng Nhập </NavLink>
+            <NavLink to={ROUTES.LOGIN}>Đăng Nhập </NavLink>
           </div> */}
           <div className="flex items-center gap-2">
             <DropdownMenu

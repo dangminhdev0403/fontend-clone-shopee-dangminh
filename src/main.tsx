@@ -8,19 +8,20 @@ import { RouterProvider } from "react-router-dom";
 import { Bounce, ToastContainer } from "react-toastify";
 
 import ListProduct from "@pages/Product/ListProduct.tsx";
+import { ROUTES } from "@utils/constants/route.ts";
 import App from "./App.tsx";
 import "./index.css";
 
 const router = createBrowserRouter([
   {
     element: <App />,
-    children: [{ path: "/", element: <ListProduct /> }],
+    children: [{ path: ROUTES.HOME, element: <ListProduct /> }],
   },
   {
     element: <Auth />,
     children: [
-      { path: "register", element: <Register /> },
-      { path: "login", element: <Login /> },
+      { path: ROUTES.REGISTER, element: <Register /> },
+      { path: ROUTES.LOGIN, element: <Login /> },
     ],
   },
 ]);
