@@ -1,9 +1,16 @@
 import { Button } from "@components/Form/Button";
 import FormInput from "@components/Form/InputText/FormInput";
-import { apiRegister } from "@service/api.service";
+import { useSinUpMutation } from "@redux/api/authApi";
+import { authSlice } from "@redux/slices/authSlice";
+import { ROUTES } from "@utils/constants/route";
+import { UserRegister } from "@utils/constants/types/auth";
+import ErrorResponse from "@utils/constants/types/errors.response";
 import { rules } from "@utils/rules";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router";
+import { toast } from "react-toastify";
 
 export interface RegisterForm {
   name: string;
@@ -16,7 +23,6 @@ const Register = () => {
     register,
     handleSubmit,
 
-    setError,
     getValues,
     formState: { errors, isSubmitting },
   } = useForm<RegisterForm>({
@@ -24,12 +30,33 @@ const Register = () => {
   });
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [sinUp, { data, isLoading, isError, error, isSuccess }] =
+    useSinUpMutation();
+
+  console.log({ data, isError, error, isSuccess, isLoading });
 
   const onSubmit = handleSubmit(async (data) => {
-    const res: boolean = await apiRegister(data, setError);
-    if (res) navigate("/");
+    const dataRegister: UserRegister = {
+      ...data,
+    };
+    sinUp(dataRegister);
   });
 
+  useEffect(() => {
+    if (isError) {
+      const err = error as ErrorResponse;
+
+      toast.error(err?.data.message);
+    }
+
+    if (isSuccess) {
+      toast.success("Đăng ký thành công");
+      dispatch(authSlice.actions.setLogin(data?.data));
+      navigate(ROUTES.HOME);
+    }
+  }, [data, isError, error, isSuccess, navigate , dispatch]);
   return (
     <div className="ml-auto bg-white p-8 lg:mr-40 lg:w-[400px]">
       <div className="hidden lg:block lg:text-2xl">Đăng Ký</div>

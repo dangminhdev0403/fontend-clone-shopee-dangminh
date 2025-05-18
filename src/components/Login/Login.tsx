@@ -1,21 +1,27 @@
 import { Button } from "@components/Form/Button";
 import FormInput from "@components/Form/InputText/FormInput";
-import { apiLogin } from "@service/api.service";
+import { useLoginMutation } from "@redux/api/authApi";
+import { authSlice } from "@redux/slices/authSlice";
+import { ROUTES } from "@utils/constants/route";
+import ErrorResponse from "@utils/constants/types/errors.response";
+import { ApiResponse, DataUserLogin } from "@utils/constants/types/response";
 import { rules } from "@utils/rules";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router";
+import { toast } from "react-toastify";
 
-export interface UserLogin {
+interface UserLogin {
   email: string;
   password: string;
 }
 
 const Login = () => {
+  const [login] = useLoginMutation();
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
-
-    setError,
 
     formState: { errors, isSubmitting },
   } = useForm<UserLogin>({
@@ -24,9 +30,21 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const onSubmit = handleSubmit(async (data: UserLogin) => {
-    const res: boolean = await apiLogin(data, setError);
-    if (res) navigate("/");
+  const onSubmit = handleSubmit(async (dataLogin: UserLogin) => {
+    try {
+      const res: ApiResponse<DataUserLogin> = await login(dataLogin).unwrap();
+      dispatch(
+        authSlice.actions.setLogin({
+          accessToken: res.data.access_token,
+          user: res.data.user,
+        }),
+      );
+      toast.success("Đăng nhập thành công");
+      navigate(ROUTES.HOME);
+    } catch (error) {
+      const err = error as ErrorResponse;
+      toast.error(err.data.message);
+    }
   });
 
   return (
