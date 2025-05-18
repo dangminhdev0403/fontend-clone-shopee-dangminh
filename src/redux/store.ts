@@ -1,5 +1,5 @@
 import { authApi } from "@redux/api/authApi";
-import { logOutMiddleware } from "@redux/middleware/middleware";
+import { actionHandlerMiddleware } from "@redux/middleware/middleware";
 import { authReducer } from "@redux/slices/authSlice";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { createPersistedReducer } from "@utils/redux/persistReducerHelper";
@@ -30,7 +30,7 @@ export const store = configureStore({
         // Bỏ qua các action đặc biệt của redux-persist
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }).concat(authApi.middleware, logOutMiddleware), // Thêm middleware của RTK Query
+    }).concat(authApi.middleware, actionHandlerMiddleware), // Thêm middleware của RTK Query
 });
 
 // Khởi tạo persistor (dùng cho PersistGate)
