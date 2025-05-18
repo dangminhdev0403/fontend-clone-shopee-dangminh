@@ -32,10 +32,7 @@ const Register = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const [sinUp, { data, isLoading, isError, error, isSuccess }] =
-    useSinUpMutation();
-
-  console.log({ data, isError, error, isSuccess, isLoading });
+  const [sinUp, { data, isError, error, isSuccess }] = useSinUpMutation();
 
   const onSubmit = handleSubmit(async (data) => {
     const dataRegister: UserRegister = {
@@ -56,7 +53,7 @@ const Register = () => {
       dispatch(authSlice.actions.setLogin(data?.data));
       navigate(ROUTES.HOME);
     }
-  }, [data, isError, error, isSuccess, navigate , dispatch]);
+  }, [data, isError, error, isSuccess, navigate, dispatch]);
   return (
     <div className="ml-auto bg-white p-8 lg:mr-40 lg:w-[400px]">
       <div className="hidden lg:block lg:text-2xl">Đăng Ký</div>
