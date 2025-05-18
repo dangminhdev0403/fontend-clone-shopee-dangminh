@@ -30,10 +30,8 @@ export const authSlice = createSlice({
       state.accessToken = action.payload.access_token;
       state.user = action.payload.user;
     },
-    setLogOut: (state: AuthState) => {
-      state.isAuthenticated = false;
-      state.accessToken = "";
-      state.user = null;
+    setLogOut: () => {
+      return initialState;
     },
   },
 });

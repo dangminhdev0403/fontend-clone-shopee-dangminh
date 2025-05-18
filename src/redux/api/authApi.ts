@@ -1,22 +1,46 @@
+import { authSlice } from "@redux/slices/authSlice";
 import { RootState } from "@redux/store"; // 👈 import đúng kiểu RootState
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { API_ROUTES } from "@service/apiRoutes";
+import { ROUTES } from "@utils/constants/route";
 import { UserLogin, UserRegister } from "@utils/constants/types/auth";
+
+const baseQuery = fetchBaseQuery({
+  baseUrl: import.meta.env.VITE_BASE_URL,
+  credentials: "include",
+  prepareHeaders: (headers, { getState }) => {
+    const state: RootState = getState() as RootState;
+    const token = state.auth.accessToken;
+    if (token) {
+      headers.set("Authorization", `Bearer ${token}`);
+    }
+    return headers;
+  },
+});
+
+import {
+  BaseQueryFn,
+  FetchArgs,
+  FetchBaseQueryError,
+} from "@reduxjs/toolkit/query";
+
+const baseQueryWithReAuth: BaseQueryFn<
+  string | FetchArgs,
+  unknown,
+  FetchBaseQueryError
+> = async (args, api, extraOptions) => {
+  const result = await baseQuery(args, api, extraOptions);
+  if (result.error?.status === 401) {
+    api.dispatch(authSlice.actions.setLogOut());
+
+    window.location.href = ROUTES.LOGIN;
+  }
+  return result;
+};
 
 export const authApi = createApi({
   reducerPath: "authApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_BASE_URL,
-    credentials: "include",
-    prepareHeaders: (headers, { getState }) => {
-      const state: RootState = getState() as RootState;
-      const token = state.auth.accessToken;
-      if (token) {
-        headers.set("Authorization", `Bearer ${token}`);
-      }
-      return headers;
-    },
-  }),
+  baseQuery: baseQueryWithReAuth,
   endpoints: (builder) => {
     return {
       sinUp: builder.mutation({
