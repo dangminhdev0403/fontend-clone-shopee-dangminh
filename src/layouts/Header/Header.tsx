@@ -15,21 +15,53 @@ import {
   faEarthAsia,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useLogOutMutation } from "@redux/api/authApi";
+import { authSlice } from "@redux/slices/authSlice";
+import { RootState } from "@redux/store";
+import { ROUTES } from "@utils/constants/route";
+import ErrorResponse from "@utils/constants/types/errors.response";
 import { language, profile } from "@utils/items.dropdown";
 import { useState } from "react";
-import { NavLink } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { NavLink, useNavigate } from "react-router";
+import { toast } from "react-toastify";
 
 const Header = () => {
+  const auth = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch();
+  const [logOut] = useLogOutMutation();
   const [query, setQuery] = useState("");
-
+  const navigate = useNavigate();
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Tìm kiếm:", query);
     // Thực hiện tìm kiếm tại đây
   };
 
-  const handleChangeLanguege = (item: string) => {
-    console.log("Thay đổi ngôn ngữ" + item);
+  const handleProfileClick = async (value: string) => {
+    console.log("Item clicked:", value);
+    switch (value) {
+      case "profile":
+        break;
+      case "order":
+        break;
+      case "logout": {
+        try {
+          await logOut({}).unwrap();
+
+          dispatch(authSlice.actions.setLogOut());
+          toast.success("Đăng xuất thành công");
+          navigate(ROUTES.LOGIN);
+        } catch (error) {
+          const err = error as ErrorResponse;
+          toast.error(err?.data?.message ?? "Có lỗi xảy ra");
+        }
+
+        break;
+      }
+      default:
+        break;
+    }
   };
   return (
     <header className="max-w-6xl bg-[#fb5831] lg:max-w-full">
@@ -70,29 +102,21 @@ const Header = () => {
 
             <FontAwesomeIcon icon={faChevronDown} className="ml-1" />
           </div>
-          {/* <div>
-            <NavLink to={ROUTES.REGISTER} className="relative mr-2 pr-2">
-              Đăng Ký <BorderRight />{" "}
-            </NavLink>
-            <NavLink to={ROUTES.LOGIN}>Đăng Nhập </NavLink>
-          </div> */}
-          <div className="flex items-center gap-2">
+          {auth.isAuthenticated ? (
             <DropdownMenu
-              label="username"
+              label={auth.user?.name ?? "Tài khoản"}
               items={profile}
-              colorActive={"#00bfa5"}
-              icon={
-                <img
-                  className="rounded-full"
-                  width={22}
-                  height={22}
-                  src="https://static.vecteezy.com/system/resources/previews/024/183/535/original/male-avatar-portrait-of-a-young-man-with-glasses-illustration-of-male-character-in-modern-color-style-vector.jpg"
-                  alt=""
-                />
-              }
-              onItemClick={handleChangeLanguege}
+              icon={<FontAwesomeIcon icon={faChevronDown} />}
+              onItemClick={handleProfileClick}
             />
-          </div>
+          ) : (
+            <div>
+              <NavLink to={ROUTES.REGISTER} className="relative mr-2 pr-2">
+                Đăng Ký <BorderRight />{" "}
+              </NavLink>
+              <NavLink to={ROUTES.LOGIN}>Đăng Nhập </NavLink>
+            </div>
+          )}
         </div>
       </nav>
       <div className="flex w-full items-center px-2 py-2.5 pb-7 lg:justify-between lg:px-40">

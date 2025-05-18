@@ -35,7 +35,7 @@ const Login = () => {
       const res: ApiResponse<DataUserLogin> = await login(dataLogin).unwrap();
       dispatch(
         authSlice.actions.setLogin({
-          accessToken: res.data.access_token,
+          access_token: res.data.access_token,
           user: res.data.user,
         }),
       );

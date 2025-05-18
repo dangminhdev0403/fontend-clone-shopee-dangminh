@@ -2,13 +2,12 @@ interface DropdownMenuProps {
   label: string;
   items: Array<{ name: string; value: string }>;
   icon?: React.ReactNode;
-  colorActive?: string;
+
   onItemClick?: (item: string) => void;
 }
 export default function DropdownMenu({
   ...props
 }: Readonly<DropdownMenuProps>) {
-  const { colorActive = "#ee4d2d" } = props;
   return (
     <div className="group relative inline-block text-white">
       {/* Nút dropdown */}
@@ -25,10 +24,8 @@ export default function DropdownMenu({
         {props.items.map((item) => (
           <button
             key={item.value}
-            style={{ "--hover-color": colorActive } as React.CSSProperties}
-            onMouseEnter={(e) => (e.currentTarget.style.color = colorActive)}
             onMouseLeave={(e) => (e.currentTarget.style.color = "")}
-            className="block w-full px-4 py-2 hover:cursor-pointer hover:bg-gray-100"
+            className="block w-full px-4 py-2 hover:cursor-pointer hover:bg-gray-100 hover:text-amber-500"
             onClick={() => props.onItemClick?.(item.value)}
           >
             {item.name}
