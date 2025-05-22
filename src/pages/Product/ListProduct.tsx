@@ -5,10 +5,31 @@ import {
   faFilter,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useProductFilter } from "@hooks/useProductFilter";
+import Pagination from "@mui/material/Pagination";
 import ItemProduct from "@pages/Product/ItemProduct";
-import { filters, products, sorts } from "@utils/constants/response";
+import productApi from "@service/product.service";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { filters, sorts } from "@utils/constants/response";
+
+import { ProductItem } from "@utils/constants/types/product.type";
 
 const ListProduct = () => {
+  const { filter, updateFilter } = useProductFilter();
+
+  const { data: listProduct } = useQuery({
+    queryKey: ["products", filter],
+    queryFn: () => productApi.getAllProducts(filter),
+    placeholderData: keepPreviousData,
+  });
+
+  console.log("listProduct", listProduct);
+
+  const currentPage = listProduct?.data?.page?.number;
+  console.log("currentPage", currentPage);
+
+  const totalPages = listProduct?.data?.page?.totalPages;
+
   return (
     <section className="grid h-full w-full bg-[#f5f5f5] py-6 lg:grid-cols-12 lg:px-20">
       <div className="lg:col-span-2">
@@ -19,6 +40,7 @@ const ListProduct = () => {
         {filters.map((item) => (
           <CheckBoxFilter key={item.id} filterData={item.filter} />
         ))}
+
         <button className="mt-2 w-full cursor-pointer rounded bg-[#ee4d2d] py-2 text-sm text-white hover:opacity-90">
           Xoá tất cả
         </button>
@@ -41,24 +63,54 @@ const ListProduct = () => {
             })}
           </div>
           <div className="hidden items-center justify-center lg:flex">
-            <span className="text-amber-500">1</span>/9
+            <span className="text-amber-500">{currentPage}</span>/{totalPages}
             <div className="ml-3 flex gap-1">
-              <button title="Previous" className="bg-white p-1.5 px-3">
+              <button
+                onClick={() => updateFilter({ page: currentPage - 1 })}
+                title="Previous"
+                className="cursor-pointer bg-white p-1.5 px-3 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={currentPage <= 1}
+              >
                 <FontAwesomeIcon icon={faChevronLeft} />
               </button>
-              <button title="Next" className="bg-white p-1.5 px-3">
+              <button
+                onClick={() => updateFilter({ page: currentPage + 1 })}
+                title="Next"
+                className="cursor-pointer bg-white p-1.5 px-3 disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={currentPage >= totalPages}
+              >
                 <FontAwesomeIcon icon={faChevronRight} />
               </button>
             </div>
           </div>
         </div>
-
         {/* List Product */}
         <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-5">
-          {products.map((item) => (
+          {listProduct?.data?.content?.map((item: ProductItem) => (
             <ItemProduct key={item.id} {...item} />
           ))}
         </div>
+        <div className="mt-10 flex w-full items-center justify-center gap-2">
+          {listProduct?.data?.page && (
+            <Pagination
+              onChange={(e, page) => updateFilter({ page: page })}
+              size="large"
+              sx={{
+                "& .MuiPaginationItem-root": {
+                  color: "gray",
+                  "&.Mui-selected": {
+                    backgroundColor: "#ee4d2d",
+                    color: "#fff",
+                  },
+                },
+              }}
+              count={totalPages}
+              page={currentPage}
+              variant="outlined"
+              shape="rounded"
+            />
+          )}
+        </div>{" "}
       </div>
     </section>
   );

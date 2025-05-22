@@ -13,4 +13,11 @@ interface DataUserLogin {
   };
 }
 
+export interface PageInfo {
+  page: number; // current page, one-based
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
 export { ApiResponse, DataUserLogin };

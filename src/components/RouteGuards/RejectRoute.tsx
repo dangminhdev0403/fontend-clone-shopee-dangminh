@@ -10,7 +10,7 @@ const RejectRoute = () => {
 
   if (isAuthenticated) {
     // Nếu đã đăng nhập, redirect về trang trước đó hoặc về "/" nếu không có
-    const from = location.state?.from?.pathname || "/";
+    const from = location.state?.from?.pathname ?? "/";
     return <Navigate to={from} replace />;
   }
 

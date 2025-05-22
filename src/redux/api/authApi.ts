@@ -30,7 +30,9 @@ const baseQueryWithReAuth: BaseQueryFn<
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
   const result = await baseQuery(args, api, extraOptions);
-  if (result.error?.status === 401) {
+
+  const url = typeof args === "string" ? args : (args.url || "").toString();
+  if (result.error?.status === 401 && !url.includes(API_ROUTES.AUTH.LOGIN)) {
     api.dispatch(authSlice.actions.setLogOut());
 
     window.location.href = ROUTES.LOGIN;

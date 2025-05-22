@@ -8,7 +8,8 @@ import { ApiResponse, DataUserLogin } from "@utils/constants/types/response";
 import { rules } from "@utils/rules";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 interface UserLogin {
@@ -42,6 +43,7 @@ const Login = () => {
       toast.success("Đăng nhập thành công");
       navigate(ROUTES.HOME);
     } catch (error) {
+      console.log(error);
       const err = error as ErrorResponse;
       toast.error(err.data.message);
     }

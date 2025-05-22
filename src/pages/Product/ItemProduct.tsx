@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 interface ItemProductProps {
   id: number;
   name: string;
-  img: string;
+  imageUrl: string;
   price: number;
   rating?: number;
   sold?: number;
@@ -14,7 +14,7 @@ interface ItemProductProps {
 const ItemProduct = ({
   id,
   name,
-  img,
+  imageUrl,
   price,
   rating = 4.8,
   sold = 1200,
@@ -27,7 +27,7 @@ const ItemProduct = ({
         <div className="relative w-full overflow-hidden pt-[100%]">
           <img
             className="absolute top-0 left-0 z-0 h-full w-full object-cover"
-            src={img}
+            src={imageUrl}
             alt={name}
           />
         </div>
