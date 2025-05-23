@@ -13,8 +13,13 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { filters, sorts } from "@utils/constants/response";
 
 import { ProductItem } from "@utils/constants/types/product.type";
+import { useState } from "react";
 
 const ListProduct = () => {
+  const [activeSort, setActiveSort] = useState<"ctime" | "price" | "sold">(
+    "ctime",
+  );
+
   const { filter, updateFilter } = useProductFilter();
 
   const { data: listProduct } = useQuery({
@@ -23,12 +28,19 @@ const ListProduct = () => {
     placeholderData: keepPreviousData,
   });
 
-  console.log("listProduct", listProduct);
-
   const currentPage = listProduct?.data?.page?.number;
-  console.log("currentPage", currentPage);
 
   const totalPages = listProduct?.data?.page?.totalPages;
+
+  const handleSort = (id: "ctime" | "price" | "sold") => {
+    setActiveSort(id);
+
+    updateFilter({
+      ...filter,
+      sortBy: id,
+      order: "desc",
+    });
+  };
 
   return (
     <section className="grid h-full w-full bg-[#f5f5f5] py-6 lg:grid-cols-12 lg:px-20">
@@ -55,7 +67,10 @@ const ListProduct = () => {
               return (
                 <button
                   key={item.id}
-                  className="ml-3 cursor-pointer bg-white px-3.5 py-2"
+                  onClick={() => {
+                    handleSort(item.id as "ctime" | "price" | "sold");
+                  }}
+                  className={`ml-3 cursor-pointer rounded border px-3.5 py-2 ${activeSort === item.id ? "bg-[#ee4d2d] text-white" : "bg-white text-gray-700"}`}
                 >
                   {item.value}
                 </button>

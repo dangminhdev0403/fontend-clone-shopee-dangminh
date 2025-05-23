@@ -148,15 +148,15 @@ export const products = [
 
 export const sorts = [
   {
-    id: "lienquan",
+    id: "relevancy",
     value: "Liên quan",
   },
   {
-    id: "baoloi",
+    id: "ctime",
     value: "Mới nhất",
   },
   {
-    id: "banchay",
+    id: "sales",
     value: "Bán chạy",
   },
 ];
