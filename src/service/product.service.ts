@@ -23,6 +23,15 @@ const productApi = {
     const response = await fetch(`https://fakestoreapi.com/products/${id}`);
     return response.json();
   },
+  getCategories: async (params?: Pageable) => {
+    const response = await instance.get(`${API_ROUTES.CATEGORY.LIST}`, {
+      params: {
+        ...params,
+      },
+    });
+    const { data } = response;
+    return data;
+  },
 };
 
 export default productApi;

@@ -6,21 +6,31 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useProductFilter } from "@hooks/useProductFilter";
+import { FormControl, MenuItem, OutlinedInput, Select } from "@mui/material";
 import Pagination from "@mui/material/Pagination";
 import ItemProduct from "@pages/Product/ItemProduct";
+import locationApi from "@service/location.service";
 import productApi from "@service/product.service";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { filters, sorts } from "@utils/constants/response";
+import { sorts } from "@utils/constants/response";
 
 import { ProductItem } from "@utils/constants/types/product.type";
-import { useState } from "react";
+
+type SortType = "ctime" | "price" | "sold" | "price_asc" | "price_desc";
 
 const ListProduct = () => {
-  const [activeSort, setActiveSort] = useState<"ctime" | "price" | "sold">(
-    "ctime",
-  );
-
+  const getSortTypeFromFilter = (sortBy: string, order: string): SortType => {
+    if (sortBy === "price" && order === "asc") return "price_asc";
+    if (sortBy === "price" && order === "desc") return "price_desc";
+    if (["ctime", "sold"].includes(sortBy)) return sortBy as SortType;
+    return "ctime";
+  };
   const { filter, updateFilter } = useProductFilter();
+
+  const activeSort = getSortTypeFromFilter(
+    filter.sortBy as string,
+    filter.order as string,
+  );
 
   const { data: listProduct } = useQuery({
     queryKey: ["products", filter],
@@ -28,18 +38,50 @@ const ListProduct = () => {
     placeholderData: keepPreviousData,
   });
 
+  const { data: listProvince } = useQuery({
+    queryKey: ["provinces"],
+    queryFn: () => locationApi.getProvinces(),
+  });
+
+  const { data: listCategory } = useQuery({
+    queryKey: ["categories"],
+    queryFn: () => productApi.getCategories(),
+  });
+
+  const searchFilters = [
+    {
+      id: "category",
+      filter: {
+        name: "Theo Danh Mục",
+        value: listCategory?.content ?? [],
+        type: "radio",
+      },
+    },
+    {
+      id: "location",
+      filter: {
+        name: "Nơi bán",
+        value: listProvince?.content ?? [],
+      },
+    },
+  ];
+
   const currentPage = listProduct?.data?.page?.number;
 
   const totalPages = listProduct?.data?.page?.totalPages;
 
-  const handleSort = (id: "ctime" | "price" | "sold") => {
-    setActiveSort(id);
-
-    updateFilter({
-      ...filter,
-      sortBy: id,
-      order: "desc",
-    });
+  const handleSort = (id: SortType) => {
+    if (id === "price_asc") {
+      updateFilter({ ...filter, sortBy: "price", order: "asc" });
+    } else if (id === "price_desc") {
+      updateFilter({ ...filter, sortBy: "price", order: "desc" });
+    } else {
+      updateFilter({
+        ...filter,
+        sortBy: id as "ctime" | "sold",
+        order: "desc",
+      });
+    }
   };
 
   return (
@@ -49,7 +91,7 @@ const ListProduct = () => {
           <FontAwesomeIcon icon={faFilter} style={{ color: "#4c4444" }} />
           <h3 className="text-base font-bold">Bộ lọc tìm kiếm</h3>
         </div>
-        {filters.map((item) => (
+        {searchFilters.map((item) => (
           <CheckBoxFilter key={item.id} filterData={item.filter} />
         ))}
 
@@ -68,14 +110,46 @@ const ListProduct = () => {
                 <button
                   key={item.id}
                   onClick={() => {
-                    handleSort(item.id as "ctime" | "price" | "sold");
+                    handleSort(item.id as SortType);
                   }}
-                  className={`ml-3 cursor-pointer rounded border px-3.5 py-2 ${activeSort === item.id ? "bg-[#ee4d2d] text-white" : "bg-white text-gray-700"}`}
+                  className={`ml-3 cursor-pointer rounded px-3.5 py-2 ${activeSort === item.id ? "bg-[#ee4d2d] text-white" : "bg-white text-gray-700"}`}
                 >
                   {item.value}
                 </button>
               );
             })}
+            <FormControl sx={{ minWidth: 200 }} size="small">
+              <Select
+                id="price"
+                value={activeSort}
+                label="Sắp xếp theo giá"
+                input={<OutlinedInput />}
+                onChange={(e) => handleSort(e.target.value as SortType)}
+                sx={{
+                  backgroundColor: "white",
+                  color: activeSort ? "#ee4d2d" : "#fff",
+                }}
+                renderValue={(selected) => {
+                  if (selected === "price_asc") {
+                    return "Giá: Thấp đến Cao";
+                  }
+
+                  if (selected === "price_desc") {
+                    return "Giá: Cao đến Thấp";
+                  }
+
+                  // Nếu không phải sắp xếp theo giá → placeholder
+                  return <span className="text-gray-400">Giá</span>;
+                }}
+                className="ml-6"
+              >
+                <MenuItem disabled value="">
+                  <em>Giá</em>
+                </MenuItem>
+                <MenuItem value="price_asc">Giá: Thấp đến Cao</MenuItem>
+                <MenuItem value="price_desc">Giá: Cao đến Thấp</MenuItem>
+              </Select>
+            </FormControl>
           </div>
           <div className="hidden items-center justify-center lg:flex">
             <span className="text-amber-500">{currentPage}</span>/{totalPages}
@@ -99,33 +173,44 @@ const ListProduct = () => {
             </div>
           </div>
         </div>
+
         {/* List Product */}
         <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-5">
-          {listProduct?.data?.content?.map((item: ProductItem) => (
-            <ItemProduct key={item.id} {...item} />
-          ))}
-        </div>
-        <div className="mt-10 flex w-full items-center justify-center gap-2">
-          {listProduct?.data?.page && (
-            <Pagination
-              onChange={(e, page) => updateFilter({ page: page })}
-              size="large"
-              sx={{
-                "& .MuiPaginationItem-root": {
-                  color: "gray",
-                  "&.Mui-selected": {
-                    backgroundColor: "#ee4d2d",
-                    color: "#fff",
-                  },
-                },
-              }}
-              count={totalPages}
-              page={currentPage}
-              variant="outlined"
-              shape="rounded"
-            />
+          {listProduct?.data?.content?.length === 0 ? (
+            <div className="col-span-5 flex w-full items-center justify-center py-10 text-lg text-gray-500">
+              Không có sản phẩm nào được tìm thấy
+            </div>
+          ) : (
+            listProduct?.data?.content?.map((item: ProductItem) => (
+              <ItemProduct key={item.id} {...item} />
+            ))
           )}
-        </div>{" "}
+        </div>
+
+        {/* Pagination */}
+        {listProduct?.data?.content?.length > 0 && (
+          <div className="mt-10 flex w-full items-center justify-center gap-2">
+            {listProduct?.data?.page && (
+              <Pagination
+                onChange={(e, page) => updateFilter({ page })}
+                size="large"
+                sx={{
+                  "& .MuiPaginationItem-root": {
+                    color: "gray",
+                    "&.Mui-selected": {
+                      backgroundColor: "#ee4d2d",
+                      color: "#fff",
+                    },
+                  },
+                }}
+                count={totalPages}
+                page={currentPage}
+                variant="outlined"
+                shape="rounded"
+              />
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

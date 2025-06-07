@@ -7,7 +7,6 @@ export const API_ROUTES = {
   },
   PRODUCT: {
     BASE: `${version}/products`,
-  
   },
   USER: {
     BASE: `${version}/user`,
@@ -16,5 +15,8 @@ export const API_ROUTES = {
 
   CATEGORY: {
     LIST: `${version}/categories`,
+  },
+  LOCATION: {
+    PROVINCES: `${version}/provinces`,
   },
 };

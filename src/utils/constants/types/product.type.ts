@@ -14,13 +14,13 @@ export interface ProductItem {
 }
 
 export interface ProductListFilter {
-  keyword?: string ;
-  stock?: number ;
-  minPrice?: number ;
+  keyword?: string;
+  stock?: number;
+  minPrice?: number;
   maxPrice?: number;
-  sortBy?: "ctime" | "price" | "sold" ;
-  order?: "asc" | "desc" ;
-  page?: number ;
-  size?: number ;
-  categoryId?: number ;
+  sortBy?: "ctime" | "price" | "sold";
+  order?: "asc" | "desc";
+  page?: number;
+  size?: number;
+  categoryId?: string;
 }
