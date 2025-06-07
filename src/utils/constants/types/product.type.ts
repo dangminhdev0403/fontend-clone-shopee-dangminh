@@ -22,5 +22,5 @@ export interface ProductListFilter {
   order?: "asc" | "desc";
   page?: number;
   size?: number;
-  categoryId?: string;
+  categoryId?: number;
 }

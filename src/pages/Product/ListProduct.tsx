@@ -25,7 +25,7 @@ const ListProduct = () => {
     if (["ctime", "sold"].includes(sortBy)) return sortBy as SortType;
     return "ctime";
   };
-  const { filter, updateFilter } = useProductFilter();
+  const { filter, updateFilter, resetFilter } = useProductFilter();
 
   const activeSort = getSortTypeFromFilter(
     filter.sortBy as string,
@@ -57,11 +57,15 @@ const ListProduct = () => {
         type: "radio",
       },
     },
+  ];
+
+  const locationFilters = [
     {
-      id: "location",
+      id: "province",
       filter: {
-        name: "Nơi bán",
+        name: "Theo Tinh Thanh",
         value: listProvince?.content ?? [],
+        type: "checkbox",
       },
     },
   ];
@@ -94,8 +98,13 @@ const ListProduct = () => {
         {searchFilters.map((item) => (
           <CheckBoxFilter key={item.id} filterData={item.filter} />
         ))}
-
-        <button className="mt-2 w-full cursor-pointer rounded bg-[#ee4d2d] py-2 text-sm text-white hover:opacity-90">
+        {locationFilters.map((item) => (
+          <CheckBoxFilter key={item.id} filterData={item.filter} />
+        ))}
+        <button
+          className="mt-2 w-full cursor-pointer rounded bg-[#ee4d2d] py-2 text-sm text-white hover:opacity-90"
+          onClick={resetFilter}
+        >
           Xoá tất cả
         </button>
       </div>

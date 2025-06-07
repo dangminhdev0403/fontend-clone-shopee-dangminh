@@ -76,6 +76,9 @@ export const useProductFilter = () => {
     const newParams = buildQueryParamsFromFilter(updated);
     navigate(`?${newParams.toString()}`);
   };
+  const resetFilter = () => {
+    navigate(`?`);
+  };
 
-  return { filter, updateFilter };
+  return { filter, updateFilter, resetFilter };
 };

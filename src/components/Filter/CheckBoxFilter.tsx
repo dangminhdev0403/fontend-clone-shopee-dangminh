@@ -11,8 +11,9 @@ interface FilterCheckBox {
 const CheckBoxFilter = ({ ...props }: FilterCheckBox) => {
   const { filter, updateFilter } = useProductFilter();
   const isActive = filter.categoryId?.toString();
+
   const handleFilter = (id: string) => {
-    updateFilter({ ...filter, categoryId: id });
+    updateFilter({ ...filter, categoryId: Number(id) });
   };
 
   return (
@@ -29,12 +30,13 @@ const CheckBoxFilter = ({ ...props }: FilterCheckBox) => {
             name={props.filterData.name}
             id={item.id}
             title={`${item.name}`}
-            className=""
+            className="cursor-pointer"
+            checked={isActive == item.id}
           />
 
           <label
             htmlFor={item.id}
-            className={`${isActive === item.id ? "text-amber-500" : ""}`}
+            className={`${isActive == item.id ? "text-amber-600" : " "} cursor-pointer`}
           >
             {item.name}
           </label>
