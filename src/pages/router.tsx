@@ -6,6 +6,7 @@ import Register from "@components/Register";
 import RejectRoute from "@components/RouteGuards/RejectRoute";
 import Auth from "@pages/Auth";
 import NotFound from "@pages/Errors/NotFound";
+import { ProductDetail } from "@pages/Product";
 import { ROUTES } from "@utils/constants/route";
 import { lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
@@ -24,6 +25,10 @@ export const router = createBrowserRouter([
       {
         path: "*",
         element: <NotFound />,
+      },
+      {
+        path: ROUTES.PRODUCT_DETAIL,
+        element: <ProductDetail />,
       },
     ],
   },

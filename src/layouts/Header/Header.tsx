@@ -23,7 +23,7 @@ import ErrorResponse from "@utils/constants/types/errors.response";
 import { language, profile } from "@utils/items.dropdown";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { NavLink, useNavigate } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
 const Header = () => {
@@ -121,7 +121,9 @@ const Header = () => {
       </nav>
       <div className="flex w-full items-center px-2 py-2.5 pb-7 lg:justify-between lg:px-40">
         <div className="flex w-full items-end justify-center">
-          <Logo />
+          <Link to={ROUTES.HOME}>
+            <Logo />
+          </Link>
           <div className="mx-auto mt-4 w-full max-w-3xl">
             <form
               onSubmit={handleSubmit}

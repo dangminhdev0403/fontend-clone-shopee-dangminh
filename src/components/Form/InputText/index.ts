@@ -1,4 +1,4 @@
 import FormInput from "@components/Form/InputText/FormInput";
-import InputSearch from "@components/Form/InputText/InputSearch";
+import QuantityInput from "@components/Form/InputText/QuantityInput";
 
-export { FormInput, InputSearch };
+export { FormInput, QuantityInput };

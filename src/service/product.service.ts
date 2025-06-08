@@ -19,9 +19,11 @@ const productApi = {
       data,
     };
   },
-  getProductById: async (id: number) => {
-    const response = await fetch(`https://fakestoreapi.com/products/${id}`);
-    return response.json();
+  getProductDetail: async (id: string) => {
+    const response = await instance.get(`${API_ROUTES.PRODUCT.BASE}/${id}`);
+    const { data } = response;
+  
+    return data;
   },
   getCategories: async (params?: Pageable) => {
     const response = await instance.get(`${API_ROUTES.CATEGORY.LIST}`, {

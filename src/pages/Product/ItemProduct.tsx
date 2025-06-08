@@ -55,7 +55,6 @@ const ItemProduct = ({
           className="absolute -bottom-9 left-0 z-20 w-full cursor-pointer bg-orange-500 py-2 text-sm text-white opacity-0 transition group-hover:opacity-100 hover:opacity-100"
           onClick={(e) => {
             e.preventDefault(); // Ngăn chuyển trang khi click vào nút
-            console.log("Tìm sản phẩm tương tự:", name);
           }}
         >
           Tìm sản phẩm tương tự
