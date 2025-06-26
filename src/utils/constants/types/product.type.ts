@@ -18,7 +18,7 @@ export interface ProductListFilter {
   stock?: number;
   minPrice?: number;
   maxPrice?: number;
-  sortBy?: "ctime" | "price" | "sold";
+  sortBy?: "ctime" | "price" | "sold" | "relevancy";
   order?: "asc" | "desc";
   page?: number;
   size?: number;

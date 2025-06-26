@@ -1,4 +1,4 @@
-import { authApi } from "@redux/api/authApi";
+import { rootApi } from "@redux/api/rootApi";
 import { actionHandlerMiddleware } from "@redux/middleware/middleware";
 import { authReducer } from "@redux/slices/authSlice";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
@@ -18,7 +18,7 @@ const rootReducer = combineReducers({
   // Persist riêng cho authReducer
   auth: createPersistedReducer("auth", authReducer),
   // Không persist api reducer (thường không nên lưu cache vào localStorage)
-  [authApi.reducerPath]: authApi.reducer,
+  [rootApi.reducerPath]: rootApi.reducer,
 });
 
 // Tạo store
@@ -30,7 +30,7 @@ export const store = configureStore({
         // Bỏ qua các action đặc biệt của redux-persist
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
-    }).concat(authApi.middleware, actionHandlerMiddleware), // Thêm middleware của RTK Query
+    }).concat(rootApi.middleware, actionHandlerMiddleware), // Thêm middleware của RTK Query
 });
 
 // Khởi tạo persistor (dùng cho PersistGate)

@@ -1,3 +1,4 @@
+import { gennerateNameId } from "@utils/helper";
 import { Link } from "react-router-dom";
 
 interface ItemProductProps {
@@ -22,7 +23,7 @@ const ItemProduct = ({
   tag,
 }: ItemProductProps) => {
   return (
-    <Link to={`/product/${id}`}>
+    <Link to={`/product/${gennerateNameId({ name, id: id.toString() })}`}>
       <div className="group relative z-10 w-full rounded-sm border border-gray-200 bg-white transition hover:z-30 hover:-translate-y-0.5 hover:border-amber-500 hover:shadow-md">
         <div className="relative aspect-[1/1] w-full overflow-hidden">
           <img

@@ -8,8 +8,8 @@ const parseProductListFilter = (queryParams: {
 }): ProductListFilter => {
   return {
     keyword: queryParams.keyword ?? "",
-    sortBy: ["ctime", "price", "sold"].includes(queryParams.sortBy)
-      ? (queryParams.sortBy as "ctime" | "price" | "sold")
+    sortBy: ["ctime", "price", "sold", "relevancy"].includes(queryParams.sortBy)
+      ? (queryParams.sortBy as "ctime" | "price" | "sold" | "relevancy")
       : "ctime",
     order: ["asc", "desc"].includes(queryParams.order)
       ? (queryParams.order as "asc" | "desc")
@@ -32,7 +32,7 @@ export const buildQueryParamsFromFilter = (
 ): URLSearchParams => {
   const cleaned = pickBy(filter, (value, key) => {
     if (key === "sortBy")
-      return ["ctime", "price", "sold"].includes(value as string);
+      return ["ctime", "price", "sold", "relevancy"].includes(value as string);
     if (key === "order") return ["asc", "desc"].includes(value as string);
     if (key === "page")
       return typeof value === "number" && Number.isInteger(value) && value >= 0;

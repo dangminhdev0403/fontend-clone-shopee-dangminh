@@ -1,6 +1,6 @@
 import { Button } from "@components/Form/Button";
 import FormInput from "@components/Form/InputText/FormInput";
-import { useSinUpMutation } from "@redux/api/authApi";
+import { useSignUpMutation } from "@redux/api/authApi";
 import { authSlice } from "@redux/slices/authSlice";
 import { ROUTES } from "@utils/constants/route";
 import { UserRegister } from "@utils/constants/types/auth";
@@ -32,7 +32,7 @@ const Register = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const [sinUp, { data, isError, error, isSuccess }] = useSinUpMutation();
+  const [sinUp, { data, isError, error, isSuccess }] = useSignUpMutation();
 
   const onSubmit = handleSubmit(async (data) => {
     const dataRegister: UserRegister = {

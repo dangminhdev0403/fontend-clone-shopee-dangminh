@@ -4,6 +4,7 @@ export const API_ROUTES = {
     LOGIN: `${version}/auth/login`,
     REGISTER: `${version}/auth/register`,
     LOGOUT: `${version}/auth/logout`,
+    REFRESH: `${version}/auth/refresh`,
   },
   PRODUCT: {
     BASE: `${version}/products`,
@@ -18,5 +19,8 @@ export const API_ROUTES = {
   },
   LOCATION: {
     PROVINCES: `${version}/provinces`,
+  },
+  CART: {
+    BASE: `${version}/cart`,
   },
 };

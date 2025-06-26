@@ -10,3 +10,19 @@ export function formatNumber(num: number): string {
   }
   return num.toString();
 }
+
+export function removeSpecialChar(str: string) {
+  /* eslint-disable no-useless-escape */
+  return str.replace(
+    /!|@|%|\^|\*|\(|\)|\+|\=|\<|\>|\?|\/|,|\.|\:|\;|\'|\"|\&|\#|\[|\]|~|\$|_|-|_|/g,
+    "",
+  );
+}
+export function gennerateNameId({ name, id }: { name: string; id: string }) {
+  return removeSpecialChar(name).replace(/\s/g, "-") + "-i." + id;
+}
+
+export function getIdFromNameId(nameId: string) {
+  const arr = nameId.split("-i.");
+  return arr[arr.length - 1];
+}

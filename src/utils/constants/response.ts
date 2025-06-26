@@ -156,7 +156,24 @@ export const sorts = [
     value: "Mới nhất",
   },
   {
-    id: "sales",
+    id: "sold",
     value: "Bán chạy",
+  },
+];
+
+export const cards = [
+  {
+    id: "1",
+    imageUrl:
+      "https://inoceramic.vn/public/uploads/Sanpham/coc-su-quai-tai-lun-20-coc-su-dep-mau-cam-lsm-n022a.jpg",
+    name: "Sản phẩm 1",
+    price: 100000,
+  },
+  {
+    id: " 2",
+    imageUrl:
+      "https://inoceramic.vn/public/uploads/Sanpham/coc-su-quai-tai-lun-20-coc-su-dep-mau-cam-lsm-n022a.jpg",
+    name: "Sản phẩm 2",
+    price: 100000,
   },
 ];

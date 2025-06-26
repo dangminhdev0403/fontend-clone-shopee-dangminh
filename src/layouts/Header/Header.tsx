@@ -2,7 +2,8 @@ import { BorderRight } from "@components/Icon";
 import Logo from "@components/Icon/Logo";
 import { FiSearch } from "react-icons/fi";
 
-import { DropdownMenu } from "@components/Dropdown";
+import { DropdownMenu, ItemDropProfile } from "@components/Dropdown";
+import ItemDropCard from "@components/Dropdown/ItemDropCard";
 import {
   faFacebook,
   faSquareInstagram,
@@ -18,9 +19,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useLogOutMutation } from "@redux/api/authApi";
 import { authSlice } from "@redux/slices/authSlice";
 import { RootState } from "@redux/store";
+import { cards } from "@utils/constants/response";
 import { ROUTES } from "@utils/constants/route";
 import ErrorResponse from "@utils/constants/types/errors.response";
-import { language, profile } from "@utils/items.dropdown";
+import { language } from "@utils/items.dropdown";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink, useNavigate } from "react-router";
@@ -63,6 +65,10 @@ const Header = () => {
         break;
     }
   };
+
+  const handleCartClick = (idCard: string) => {
+    console.log("Item clicked:", idCard);
+  };
   return (
     <header className="max-w-6xl bg-[#fb5831] lg:max-w-full">
       <nav className="hidden justify-around pt-1.5 text-sm font-medium text-white lg:flex">
@@ -93,21 +99,38 @@ const Header = () => {
             <FontAwesomeIcon icon={faCircleQuestion} className="mr-1" />
             Hỗ Trợ
           </NavLink>
-          <div className="relative mr-2 pr-2">
+          <div className="mr-2 pr-2">
             <DropdownMenu
               label="Tiếng Việt"
               items={language}
               icon={<FontAwesomeIcon icon={faEarthAsia} />}
+              renderItem={(item) => (
+                <ItemDropProfile
+                  name={item.name}
+                  value={item.value}
+                  onItemClick={(value) => {
+                    console.log("Ngôn ngữ được chọn:", value);
+                  }}
+                />
+              )}
             />
-
-            <FontAwesomeIcon icon={faChevronDown} className="ml-1" />
           </div>
           {auth.isAuthenticated ? (
             <DropdownMenu
-              label={auth.user?.name ?? "Tài khoản"}
-              items={profile}
+              label={auth.user?.name}
               icon={<FontAwesomeIcon icon={faChevronDown} />}
-              onItemClick={handleProfileClick}
+              items={[
+                { id: 2, name: "Trang cá nhân", value: "profile" },
+                { id: 1, name: "Đăng xuất", value: "logout" },
+              ]}
+              renderItem={(item) => (
+                <ItemDropProfile
+                  key={item.id}
+                  name={item.name}
+                  value={item.value}
+                  onItemClick={handleProfileClick}
+                />
+              )}
             />
           ) : (
             <div>
@@ -146,10 +169,27 @@ const Header = () => {
             </form>
           </div>
 
-          <div className="ml-4">
-            <FontAwesomeIcon
-              icon={faCartShopping}
-              className="rounded-full border border-white p-2 text-white"
+          <div className="group mr-auto min-w-10 cursor-pointer">
+            <DropdownMenu
+              icon={
+                <FontAwesomeIcon
+                  icon={faCartShopping}
+                  size="lg"
+                  className="relative z-20 my-auto rounded-full border border-white p-2 text-white"
+                />
+              }
+              isCard={true}
+              items={cards}
+              popsition="ml-[51px] w-[300px] left-[-19rem]"
+              renderItem={(item) => (
+                <ItemDropCard
+                  id={item.id}
+                  name={item.name}
+                  price={item.price}
+                  imageUrl={item.imageUrl}
+                  onItemClick={(id) => handleCartClick(id)}
+                />
+              )}
             />
           </div>
         </div>

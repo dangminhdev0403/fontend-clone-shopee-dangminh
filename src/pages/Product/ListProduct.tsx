@@ -15,17 +15,39 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { sorts } from "@utils/constants/response";
 
 import { ProductItem } from "@utils/constants/types/product.type";
+import { useEffect, useState } from "react";
 
-type SortType = "ctime" | "price" | "sold" | "price_asc" | "price_desc";
+type SortType =
+  | "ctime"
+  | "price"
+  | "sold"
+  | "relevancy"
+  | "price_asc"
+  | "price_desc";
 
 const ListProduct = () => {
   const getSortTypeFromFilter = (sortBy: string, order: string): SortType => {
+    console.log(sortBy);
+
     if (sortBy === "price" && order === "asc") return "price_asc";
     if (sortBy === "price" && order === "desc") return "price_desc";
-    if (["ctime", "sold"].includes(sortBy)) return sortBy as SortType;
+    if (["ctime", "sold", "relevancy"].includes(sortBy))
+      return sortBy as SortType;
     return "ctime";
   };
   const { filter, updateFilter, resetFilter } = useProductFilter();
+
+  const [sortState, setSortState] = useState<SortType>(() =>
+    getSortTypeFromFilter(filter.sortBy as string, filter.order as string),
+  );
+
+  useEffect(() => {
+    console.log("filter.sortBy:", filter.sortBy); // 👀 kiểm tra filter sau mỗi lần update
+
+    setSortState(
+      getSortTypeFromFilter(filter.sortBy as string, filter.order as string),
+    );
+  }, [filter.sortBy, filter.order]);
 
   const activeSort = getSortTypeFromFilter(
     filter.sortBy as string,
@@ -52,6 +74,7 @@ const ListProduct = () => {
     {
       id: "category",
       filter: {
+        key: "categoryId",
         name: "Theo Danh Mục",
         value: listCategory?.content ?? [],
         type: "radio",
@@ -63,7 +86,8 @@ const ListProduct = () => {
     {
       id: "province",
       filter: {
-        name: "Theo Tinh Thanh",
+        key: "provinceId",
+        name: "Theo Tinh Thành",
         value: listProvince?.content ?? [],
         type: "checkbox",
       },
@@ -82,7 +106,7 @@ const ListProduct = () => {
     } else {
       updateFilter({
         ...filter,
-        sortBy: id as "ctime" | "sold",
+        sortBy: id as "ctime" | "relevancy" | "sold",
         order: "desc",
       });
     }
@@ -99,7 +123,7 @@ const ListProduct = () => {
           <CheckBoxFilter key={item.id} filterData={item.filter} />
         ))}
         {locationFilters.map((item) => (
-          <CheckBoxFilter key={item.id} filterData={item.filter} />
+          <CheckBoxFilter key={`${item.id}`} filterData={item.filter} />
         ))}
         <button
           className="mt-2 w-full cursor-pointer rounded bg-[#ee4d2d] py-2 text-sm text-white hover:opacity-90"
@@ -121,7 +145,7 @@ const ListProduct = () => {
                   onClick={() => {
                     handleSort(item.id as SortType);
                   }}
-                  className={`ml-3 cursor-pointer rounded px-3.5 py-2 ${activeSort === item.id ? "bg-[#ee4d2d] text-white" : "bg-white text-gray-700"}`}
+                  className={`ml-3 cursor-pointer rounded px-3.5 py-2 ${sortState === item.id ? "bg-[#ee4d2d] text-white" : "bg-white text-gray-700"}`}
                 >
                   {item.value}
                 </button>
@@ -130,7 +154,11 @@ const ListProduct = () => {
             <FormControl sx={{ minWidth: 200 }} size="small">
               <Select
                 id="price"
-                value={activeSort}
+                value={
+                  ["price_asc", "price_desc"].includes(sortState)
+                    ? sortState
+                    : ""
+                }
                 label="Sắp xếp theo giá"
                 input={<OutlinedInput />}
                 onChange={(e) => handleSort(e.target.value as SortType)}

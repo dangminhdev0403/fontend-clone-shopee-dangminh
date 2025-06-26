@@ -1,9 +1,11 @@
-const language: Array<{ name: string; value: string }> = [
+const language: Array<{ id: number; name: string; value: string }> = [
   {
+    id: 2,
     name: " Tiếng Việt",
     value: "vi",
   },
   {
+    id: 21,
     name: "Tiếng Anh",
     value: "en",
   },
