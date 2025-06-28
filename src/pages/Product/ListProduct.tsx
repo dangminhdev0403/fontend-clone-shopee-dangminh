@@ -27,8 +27,6 @@ type SortType =
 
 const ListProduct = () => {
   const getSortTypeFromFilter = (sortBy: string, order: string): SortType => {
-    console.log(sortBy);
-
     if (sortBy === "price" && order === "asc") return "price_asc";
     if (sortBy === "price" && order === "desc") return "price_desc";
     if (["ctime", "sold", "relevancy"].includes(sortBy))
@@ -42,8 +40,6 @@ const ListProduct = () => {
   );
 
   useEffect(() => {
-    console.log("filter.sortBy:", filter.sortBy); // 👀 kiểm tra filter sau mỗi lần update
-
     setSortState(
       getSortTypeFromFilter(filter.sortBy as string, filter.order as string),
     );

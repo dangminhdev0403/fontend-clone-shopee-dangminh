@@ -1,5 +1,7 @@
 import { Button } from "@mui/material";
+import { ROUTES } from "@utils/constants/route";
 import React from "react";
+import { useNavigate } from "react-router";
 
 type HasId = { id: string | number };
 
@@ -20,12 +22,19 @@ export default function DropdownMenu<T extends HasId>({
   renderItem,
   popsition,
 }: Readonly<DropdownMenuProps<T>>) {
+  const navigate = useNavigate();
   return (
     <div className="group relative inline-block text-white">
       {/* Nút dropdown */}
-      <div className="flex cursor-pointer items-center gap-1 bg-transparent px-2">
+      <div className="relative flex cursor-pointer items-center gap-1 bg-transparent px-2">
         {icon && <span>{icon}</span>}
-        {label && <span>{label}</span>}
+        {label && (
+          <div
+            className={`${isCard ? "absolute top-[0] right-[0] z-20 rounded-full bg-amber-50 px-1 align-text-top text-sm text-amber-600" : "text-base"}`}
+          >
+            {label}
+          </div>
+        )}
       </div>
 
       {/* Menu dropdown */}
@@ -36,14 +45,33 @@ export default function DropdownMenu<T extends HasId>({
         {isCard && (
           <p className="ml-2 p-2 text-sm text-gray-400">Sản phẩm mới thêm</p>
         )}
-        {items.map((item) => (
+        {items.slice(0, 5).map((item) => (
           <React.Fragment key={item.id}>{renderItem(item)}</React.Fragment>
         ))}
-        <div className="flex items-center justify-end p-2">
-          <Button variant="contained" className="!bg-[#ee4d2d]" >
-            Xem giỏ hàng
-          </Button>
-        </div>
+        {isCard && (
+          <div className="flex items-center justify-between p-2">
+            <div>
+              {items.length > 5 ? (
+                <span className="text-sm text-gray-700">
+                  +{items.length - 5} sản phẩm khác
+                </span>
+              ) : (
+                <span className="text-sm text-gray-500">
+                  Không có sản phẩm nào
+                </span>
+              )}
+            </div>
+            <Button
+              variant="contained"
+              className="!bg-[#ee4d2d]"
+              onClick={() => {
+                navigate(ROUTES.CART);
+              }}
+            >
+              Xem giỏ hàng
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

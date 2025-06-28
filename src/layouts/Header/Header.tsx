@@ -17,9 +17,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useLogOutMutation } from "@redux/api/authApi";
+import { useGetCartQuery } from "@redux/api/cartApi";
 import { authSlice } from "@redux/slices/authSlice";
 import { RootState } from "@redux/store";
-import { cards } from "@utils/constants/response";
 import { ROUTES } from "@utils/constants/route";
 import ErrorResponse from "@utils/constants/types/errors.response";
 import { language } from "@utils/items.dropdown";
@@ -34,6 +34,9 @@ const Header = () => {
   const [logOut] = useLogOutMutation();
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
+
+  const { data: cart } = useGetCartQuery();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Tìm kiếm:", query);
@@ -143,7 +146,7 @@ const Header = () => {
         </div>
       </nav>
       <div className="flex w-full items-center px-2 py-2.5 pb-7 lg:justify-between lg:px-40">
-        <div className="flex w-full items-end justify-center">
+        <div className="flex w-full items-end justify-center gap-3">
           <Link to={ROUTES.HOME}>
             <Logo />
           </Link>
@@ -171,6 +174,7 @@ const Header = () => {
 
           <div className="group mr-auto min-w-10 cursor-pointer">
             <DropdownMenu
+              label="6"
               icon={
                 <FontAwesomeIcon
                   icon={faCartShopping}
@@ -179,14 +183,14 @@ const Header = () => {
                 />
               }
               isCard={true}
-              items={cards}
+              items={cart?.cartDetails || []}
               popsition="ml-[51px] w-[300px] left-[-19rem]"
               renderItem={(item) => (
                 <ItemDropCard
-                  id={item.id}
-                  name={item.name}
-                  price={item.price}
-                  imageUrl={item.imageUrl}
+                  id={item.id.toString()}
+                  name={item.product.name}
+                  price={item.product.price}
+                  imageUrl={item.product.imageUrl}
                   onItemClick={(id) => handleCartClick(id)}
                 />
               )}

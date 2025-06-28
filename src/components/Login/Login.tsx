@@ -108,7 +108,7 @@ const Login = () => {
       </div>
       <div className="mt-2 lg:mt-5 lg:text-center">
         Bạn mới biết đến Shopee?{" "}
-        <Link to={"/register"} className="cursor-pointer text-[#EE4D2D]">
+        <Link to={ROUTES.REGISTER} className="cursor-pointer text-[#EE4D2D]">
           Đăng ký
         </Link>
       </div>

@@ -3,6 +3,7 @@
 import App from "@App";
 import Login from "@components/Login";
 import Register from "@components/Register";
+import ProtectedRoute from "@components/RouteGuards/ProtectedRoute";
 import RejectRoute from "@components/RouteGuards/RejectRoute";
 import Auth from "@pages/Auth";
 import NotFound from "@pages/Errors/NotFound";
@@ -12,6 +13,7 @@ import { lazy } from "react";
 import { createBrowserRouter } from "react-router-dom";
 
 const ListProduct = lazy(() => import("@pages/Product/ListProduct"));
+const CartPage = lazy(() => import("@pages/Cart/CartPage"));
 export const router = createBrowserRouter([
   {
     path: ROUTES.HOME,
@@ -30,8 +32,18 @@ export const router = createBrowserRouter([
         path: ROUTES.PRODUCT_DETAIL,
         element: <ProductDetail />,
       },
+      {
+        element: <ProtectedRoute />,
+        children: [
+          {
+            path: ROUTES.CART,
+            element: <CartPage />,
+          },
+        ],
+      },
     ],
   },
+
   {
     element: <RejectRoute />,
     children: [

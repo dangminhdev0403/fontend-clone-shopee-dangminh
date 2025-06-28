@@ -1,13 +1,30 @@
 import { Box, IconButton, InputBase } from "@mui/material";
-import { useState } from "react";
+import { ChangeEvent } from "react";
 
-export default function QuantityInput({ max }: { max?: number }) {
-  const [quantity, setQuantity] = useState(1);
+interface QuantityInputProps {
+  value: number;
+  onChange: (value: number) => void;
+  max?: number;
+}
 
-  const handleChange = (value: number) => {
-    if (value < 1) return;
-    if (max && value > max) return;
-    setQuantity(value);
+export default function QuantityInput({
+  value,
+  onChange,
+  max,
+}: QuantityInputProps) {
+  const handleChange = (newValue: number) => {
+    if (newValue < 1) return;
+    if (max && newValue > max) return;
+    onChange(newValue);
+  };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const val = parseInt(e.target.value);
+    if (!isNaN(val)) {
+      handleChange(val);
+    } else {
+      onChange(1); // fallback khi xoá input
+    }
   };
 
   return (
@@ -21,7 +38,7 @@ export default function QuantityInput({ max }: { max?: number }) {
     >
       <IconButton
         size="small"
-        onClick={() => handleChange(quantity - 1)}
+        onClick={() => handleChange(value - 1)}
         sx={{
           borderRight: "1px solid #ccc",
           borderRadius: 0,
@@ -33,32 +50,21 @@ export default function QuantityInput({ max }: { max?: number }) {
       </IconButton>
 
       <InputBase
-        value={quantity}
-        onChange={(e) => {
-          const value = parseInt(e.target.value) || 1;
-          handleChange(value);
-        }}
-        slotProps={{
-          input: {
-            style: {
-              textAlign: "center",
-              padding: 0,
-              fontSize: 16,
-              width: 80,
-            },
-          },
-        }}
-        sx={{
-          "& .MuiInputBase-root": {
-            justifyContent: "center",
+        value={value}
+        onChange={handleInputChange}
+        inputProps={{
+          style: {
             textAlign: "center",
+            padding: 0,
+            fontSize: 16,
+            width: 80,
           },
         }}
       />
 
       <IconButton
         size="small"
-        onClick={() => handleChange(quantity + 1)}
+        onClick={() => handleChange(value + 1)}
         sx={{
           borderLeft: "1px solid #ccc",
           borderRadius: 0,

@@ -21,6 +21,8 @@ export const API_ROUTES = {
     PROVINCES: `${version}/provinces`,
   },
   CART: {
-    BASE: `${version}/cart`,
+    GET: `${version}/products/get-cart`,
+    ADD: `${version}/products/add-to-cart`,
+    REMOVE: `${version}/products/remove-from-cart`,
   },
 };

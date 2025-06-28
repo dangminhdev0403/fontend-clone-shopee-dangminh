@@ -6,12 +6,14 @@ import {
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useAddToCartMutation } from "@redux/api/cartApi";
 import productApi from "@service/product.service";
 import { useQuery } from "@tanstack/react-query";
 import { formatNumber, getIdFromNameId } from "@utils/helper";
 import DOMPurify from "dompurify";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
+import { toast } from "react-toastify";
 
 interface ProductImage {
   id: number;
@@ -31,6 +33,9 @@ const ProductDetail = () => {
   const [isActive, setIsActive] = useState<number | undefined>(undefined);
   const [isImageUrl, setIsImageUrl] = useState<string | undefined>(undefined);
   const imageRef = useRef<HTMLImageElement>(null);
+  const [quantity, setQuantity] = useState<number>(1); // set mặc định
+
+  const [addToCart] = useAddToCartMutation();
 
   useEffect(() => {
     if (productDetailData?.images?.length) {
@@ -87,7 +92,18 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = (id: string) => {
-    console.log(id);
+    addToCart({ productId: parseInt(id), quantity, action: "INCREASE" })
+      .unwrap()
+      .then(() => {
+        // Handle success, e.g., show a success message
+        toast.success("Thêm vào giỏ hàng thành công");
+      })
+      .catch((error) => {
+        // Handle error, e.g., show an error message
+        console.log(error);
+
+        toast.error(` ${error.data.message}`);
+      });
   };
   return (
     <div className="bg-gray-100 py-10">
@@ -170,7 +186,11 @@ const ProductDetail = () => {
             <div className="mt-8 flex items-center">
               <div className="text-gray-500 capitalize">Số lượng:</div>
               <div className="ml-10 flex items-center">
-                <QuantityInput max={productDetailData?.stock} />
+                <QuantityInput
+                  value={quantity}
+                  onChange={(val) => setQuantity(val)}
+                  max={productDetailData?.stock}
+                />{" "}
                 <span className="ml-2 text-gray-500">
                   {productDetailData?.stock} sản phẩm có sẵn
                 </span>
