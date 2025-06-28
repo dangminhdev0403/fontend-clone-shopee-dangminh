@@ -6,6 +6,7 @@ import Register from "@components/Register";
 import ProtectedRoute from "@components/RouteGuards/ProtectedRoute";
 import RejectRoute from "@components/RouteGuards/RejectRoute";
 import Auth from "@pages/Auth";
+import CheckOutPage from "@pages/CheckOut";
 import NotFound from "@pages/Errors/NotFound";
 import { ProductDetail } from "@pages/Product";
 import { ROUTES } from "@utils/constants/route";
@@ -38,6 +39,10 @@ export const router = createBrowserRouter([
           {
             path: ROUTES.CART,
             element: <CartPage />,
+          },
+          {
+            path: ROUTES.CHECKOUT,
+            element: <CheckOutPage />,
           },
         ],
       },

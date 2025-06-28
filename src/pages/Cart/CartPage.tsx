@@ -113,6 +113,14 @@ export default function CartPage() {
     0,
   );
 
+  const handleCheckout = () => {
+    if (selectedItems.length === 0) {
+      toast.error("Vui lòng chọn ít nhất một sản phẩm để thanh toán.");
+      return;
+    }
+    // Navigate to checkout page with selected items
+    navigate(ROUTES.CHECKOUT, { state: { selectedItems } });
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
       <div className="mx-auto max-w-7xl px-4 py-6">
@@ -241,8 +249,13 @@ export default function CartPage() {
                       variant="contained"
                       size="large"
                       disabled={selectedItems.length === 0}
-                      className="bg-gradient-to-r from-orange-500 to-red-500 px-8 py-3 text-white shadow-lg hover:from-orange-600 hover:to-red-600"
+                      className={`bg-gradient-to-r from-orange-500 to-red-500 px-8 py-3 !text-white shadow-lg hover:from-orange-600 hover:to-red-600 ${
+                        selectedItems.length === 0
+                          ? "cursor-not-allowed opacity-50"
+                          : ""
+                      }`}
                       startIcon={<ShoppingCart />}
+                      onClick={handleCheckout}
                     >
                       Mua hàng ({selectedItems.length})
                     </Button>
