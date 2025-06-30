@@ -25,4 +25,9 @@ export const API_ROUTES = {
     ADD: `${version}/products/add-to-cart`,
     REMOVE: `${version}/products/remove-from-cart`,
   },
+  ADDRESS: {
+    PROVINCES: `${version}/provinces`,
+    DISTRICTS: `${version}/districts`,
+    WARDS: `${version}/wards`,
+  },
 };

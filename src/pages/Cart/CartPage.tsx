@@ -17,6 +17,7 @@ import {
   useAddToCartMutation,
   useRemoveFromCartMutation,
 } from "@redux/api/cartApi";
+import { checkoutSlice } from "@redux/slices/checkoutSlice";
 import { RootState } from "@redux/store";
 import { ROUTES } from "@utils/constants/route";
 import {
@@ -27,7 +28,7 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
@@ -47,6 +48,7 @@ export default function CartPage() {
       },
   );
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
   const [voucherCode, setVoucherCode] = useState("");
@@ -118,6 +120,15 @@ export default function CartPage() {
       toast.error("Vui lòng chọn ít nhất một sản phẩm để thanh toán.");
       return;
     }
+    const selectedCartItemsForCheckout = selectedCartItems.map((item) => ({
+      id: item.id,
+      name: item.product.name,
+      image: item.product.imageUrl,
+      price: item.product.price,
+      quantity: item.quantity,
+    }));
+    dispatch(checkoutSlice.actions.setCart(selectedCartItemsForCheckout));
+
     // Navigate to checkout page with selected items
     navigate(ROUTES.CHECKOUT, { state: { selectedItems } });
   };

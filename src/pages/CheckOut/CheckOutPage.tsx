@@ -1,5 +1,4 @@
-"use client";
-
+import { AddressDialog } from "@components/Dialog";
 import {
   Alert,
   Badge,
@@ -18,11 +17,11 @@ import {
   RadioGroup,
   Skeleton,
   Snackbar,
-  Switch,
   TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
+import { RootState } from "@redux/store";
 import { motion } from "framer-motion";
 import {
   AlertTriangle,
@@ -38,23 +37,20 @@ import {
   Gift,
   Home,
   Info,
-  Mail,
   MapIcon,
   MapPin,
   Package,
-  Plus,
   RefreshCw,
   Shield,
   ShoppingBag,
   Smartphone,
-  Star,
-  TrendingUp,
   Truck,
   Wallet,
   XCircle,
   Zap,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 // Enhanced Interfaces
 interface AddressDTO {
@@ -81,22 +77,6 @@ interface PaymentMethodDTO {
   isRecommended?: boolean;
   processingTime?: string;
   benefits?: string[];
-}
-
-interface ProductDTO {
-  id: number;
-  name: string;
-  price: number;
-  originalPrice?: number;
-  quantity: number;
-  image: string;
-  variant?: string;
-  shopName: string;
-  shopRating: number;
-  freeShipping: boolean;
-  fastDelivery: boolean;
-  warranty?: string;
-  insurance?: boolean;
 }
 
 interface VoucherDTO {
@@ -128,24 +108,58 @@ const mockAddresses: AddressDTO[] = [
     id: 1,
     name: "Nguyễn Văn A",
     phone: "0123456789",
-    address: "123 Đường Nguyễn Huệ",
-    ward: "Phường Bến Nghé",
+    address: "Số 1, Đường ABC",
+    ward: "Phường 1",
     district: "Quận 1",
-    province: "TP. Hồ Chí Minh",
-    isDefault: true,
+    province: "TP.HCM",
     type: "home",
-    coordinates: { lat: 10.7769, lng: 106.7009 },
+    isDefault: true,
   },
   {
     id: 2,
-    name: "Nguyễn Văn A",
-    phone: "0123456789",
-    address: "456 Đường Lê Lợi",
-    ward: "Phường Bến Thành",
-    district: "Quận 1",
-    province: "TP. Hồ Chí Minh",
-    isDefault: false,
+    name: "Nguyễn Thị B",
+    phone: "0987654321",
+    address: "Tầng 5, Tòa nhà XYZ",
+    ward: "Phường 2",
+    district: "Quận 3",
+    province: "TP.HCM",
     type: "office",
+    isDefault: false,
+    coordinates: { lat: 10.762622, lng: 106.660172 },
+  },
+  {
+    id: 3,
+    name: "Trần Văn C",
+    phone: "0369852147",
+    address: "123 Đường Lê Lợi",
+    ward: "Phường Bến Nghé",
+    district: "Quận 1",
+    province: "TP.HCM",
+    type: "home",
+    isDefault: false,
+  },
+  {
+    id: 4,
+    name: "Lê Thị D",
+    phone: "0912345678",
+    address: "456 Nguyễn Huệ",
+    ward: "Phường Nguyễn Thái Bình",
+    district: "Quận 1",
+    province: "TP.HCM",
+    type: "office",
+    isDefault: false,
+    coordinates: { lat: 10.776889, lng: 106.700806 },
+  },
+  {
+    id: 5,
+    name: "Phạm Văn E",
+    phone: "0778899001",
+    address: "789 Võ Văn Tần",
+    ward: "Phường 6",
+    district: "Quận 3",
+    province: "TP.HCM",
+    type: "other",
+    isDefault: false,
   },
 ];
 
@@ -229,39 +243,6 @@ const mockShippingOptions: ShippingOptionDTO[] = [
   },
 ];
 
-const mockProducts: ProductDTO[] = [
-  {
-    id: 1,
-    name: "Áo thun nam cotton 100% cao cấp, form rộng unisex",
-    price: 299000,
-    originalPrice: 399000,
-    quantity: 2,
-    image: "/placeholder.svg?height=80&width=80",
-    variant: "Màu đen, Size L",
-    shopName: "Fashion Store VN",
-    shopRating: 4.8,
-    freeShipping: true,
-    fastDelivery: true,
-    warranty: "12 tháng",
-    insurance: true,
-  },
-  {
-    id: 2,
-    name: "Giày sneaker nam nữ đế cao su non, phong cách Hàn Quốc",
-    price: 450000,
-    originalPrice: 550000,
-    quantity: 1,
-    image: "/placeholder.svg?height=80&width=80",
-    variant: "Màu trắng, Size 42",
-    shopName: "Sneaker World",
-    shopRating: 4.6,
-    freeShipping: true,
-    fastDelivery: false,
-    warranty: "6 tháng",
-    insurance: true,
-  },
-];
-
 const mockVouchers: VoucherDTO[] = [
   {
     id: "1",
@@ -298,6 +279,8 @@ const mockVouchers: VoucherDTO[] = [
 
 export default function CheckOutPage() {
   // States
+  const checkoutCart = useSelector((state: RootState) => state.checkout.cart);
+
   const [selectedAddress, setSelectedAddress] = useState<AddressDTO>(
     mockAddresses[0],
   );
@@ -307,7 +290,7 @@ export default function CheckOutPage() {
   const [showVoucherDialog, setShowVoucherDialog] = useState(false);
   const [voucherCode, setVoucherCode] = useState("");
   const [appliedVouchers, setAppliedVouchers] = useState<VoucherDTO[]>([]);
-  const [orderNote, setOrderNote] = useState("");
+
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
   type NotificationType = "success" | "error" | "info" | "warning";
@@ -320,9 +303,7 @@ export default function CheckOutPage() {
     message: "",
     type: "success",
   });
-  const [giftWrap, setGiftWrap] = useState(false);
-  const [insurance, setInsurance] = useState(true);
-  const [newsletter, setNewsletter] = useState(false);
+
   const [estimatedDelivery, setEstimatedDelivery] = useState<Date>(new Date());
 
   // Simulate page loading
@@ -343,21 +324,19 @@ export default function CheckOutPage() {
   }, [selectedShipping]);
 
   // Calculations
-  const subtotal = mockProducts.reduce(
+  const subtotal = checkoutCart.reduce(
     (total, product) => total + product.price * product.quantity,
     0,
   );
   const selectedShippingOption = mockShippingOptions.find(
     (s) => s.id === selectedShipping,
   );
-  const shippingFee = selectedShippingOption?.price || 0;
+  const shippingFee = selectedShippingOption?.price ?? 0;
   const selectedPaymentMethod = mockPaymentMethods.find(
     (p) => p.id === selectedPayment,
   );
   const paymentFee = selectedPaymentMethod?.fee ?? 0;
   const paymentDiscount = selectedPaymentMethod?.discount ?? 0;
-  const giftWrapFee = giftWrap ? 15000 : 0;
-  const insuranceFee = insurance ? 10000 : 0;
 
   const voucherDiscount = appliedVouchers.reduce((total, voucher) => {
     if (voucher.type === "percentage") {
@@ -370,24 +349,7 @@ export default function CheckOutPage() {
   }, 0);
 
   const totalAmount =
-    subtotal +
-    shippingFee +
-    paymentFee +
-    giftWrapFee +
-    insuranceFee -
-    paymentDiscount -
-    voucherDiscount;
-  const totalSavings =
-    mockProducts.reduce(
-      (total, product) =>
-        total +
-        (product.originalPrice
-          ? (product.originalPrice - product.price) * product.quantity
-          : 0),
-      0,
-    ) +
-    paymentDiscount +
-    voucherDiscount;
+    subtotal + shippingFee + paymentFee + paymentDiscount - voucherDiscount;
 
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("vi-VN", {
@@ -495,13 +457,6 @@ export default function CheckOutPage() {
                   className="bg-green-100 text-green-700"
                 />
               </Badge>
-            </div>
-            <div className="flex items-center gap-2">
-              <Chip
-                label={`Tiết kiệm ${formatPrice(totalSavings)}`}
-                className="bg-green-100 text-green-700"
-                icon={<TrendingUp className="h-4 w-4" />}
-              />
             </div>
           </div>
 
@@ -622,14 +577,14 @@ export default function CheckOutPage() {
                         Sản phẩm đã chọn
                       </Typography>
                       <Chip
-                        label={`${mockProducts.length} sản phẩm`}
+                        label={`${checkoutCart.length} sản phẩm`}
                         className="bg-blue-100 text-blue-700"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-4">
-                    {mockProducts.map((product, index) => (
+                    {checkoutCart.map((product, index) => (
                       <motion.div
                         key={product.id}
                         initial={{ opacity: 0, y: 20 }}
@@ -644,16 +599,6 @@ export default function CheckOutPage() {
                               alt={product.name}
                               className="h-20 w-20 rounded-lg object-cover"
                             />
-                            {product.fastDelivery && (
-                              <div className="absolute -top-1 -right-1">
-                                <Chip
-                                  label="Nhanh"
-                                  size="small"
-                                  className="bg-red-500 text-white"
-                                  icon={<Zap className="h-3 w-3" />}
-                                />
-                              </div>
-                            )}
                           </div>
 
                           <div className="flex-1">
@@ -663,56 +608,6 @@ export default function CheckOutPage() {
                             >
                               {product.name}
                             </Typography>
-                            <Typography
-                              variant="body2"
-                              className="mb-2 text-gray-600"
-                            >
-                              {product.variant}
-                            </Typography>
-
-                            <div className="mb-2 flex items-center gap-3">
-                              <div className="flex items-center gap-1">
-                                <Building2 className="h-3 w-3 text-gray-500" />
-                                <Typography
-                                  variant="caption"
-                                  className="text-gray-600"
-                                >
-                                  {product.shopName}
-                                </Typography>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                                <Typography variant="caption">
-                                  {product.shopRating}
-                                </Typography>
-                              </div>
-                              {product.warranty && (
-                                <Chip
-                                  label={`BH ${product.warranty}`}
-                                  size="small"
-                                  className="bg-green-100 text-green-700"
-                                />
-                              )}
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                              {product.freeShipping && (
-                                <Chip
-                                  label="Freeship"
-                                  size="small"
-                                  icon={<Truck className="h-3 w-3" />}
-                                  className="bg-green-100 text-green-700"
-                                />
-                              )}
-                              {product.insurance && (
-                                <Chip
-                                  label="Bảo hiểm"
-                                  size="small"
-                                  icon={<Shield className="h-3 w-3" />}
-                                  className="bg-blue-100 text-blue-700"
-                                />
-                              )}
-                            </div>
                           </div>
 
                           <div className="text-right">
@@ -723,14 +618,6 @@ export default function CheckOutPage() {
                               >
                                 {formatPrice(product.price)}
                               </Typography>
-                              {product.originalPrice && (
-                                <Typography
-                                  variant="caption"
-                                  className="text-gray-400 line-through"
-                                >
-                                  {formatPrice(product.originalPrice)}
-                                </Typography>
-                              )}
                             </div>
                             <Typography
                               variant="body2"
@@ -968,134 +855,6 @@ export default function CheckOutPage() {
                 </CardContent>
               </Card>
             </motion.div>
-
-            {/* Enhanced Additional Services */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              <Card className="overflow-hidden shadow-lg">
-                <CardContent className="p-6">
-                  <Typography variant="h6" className="mb-4 font-semibold">
-                    Dịch vụ bổ sung
-                  </Typography>
-
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between rounded-lg border p-3">
-                      <div className="flex items-center gap-3">
-                        <Gift className="h-5 w-5 text-pink-500" />
-                        <div>
-                          <Typography
-                            variant="subtitle2"
-                            className="font-medium"
-                          >
-                            Gói quà tặng
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            className="text-gray-600"
-                          >
-                            Đóng gói đẹp mắt với thiệp chúc mừng
-                          </Typography>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Typography variant="body2" className="text-orange-600">
-                          +{formatPrice(15000)}
-                        </Typography>
-                        <Switch
-                          checked={giftWrap}
-                          onChange={(e) => setGiftWrap(e.target.checked)}
-                          color="primary"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between rounded-lg border p-3">
-                      <div className="flex items-center gap-3">
-                        <Shield className="h-5 w-5 text-blue-500" />
-                        <div>
-                          <Typography
-                            variant="subtitle2"
-                            className="font-medium"
-                          >
-                            Bảo hiểm hàng hóa
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            className="text-gray-600"
-                          >
-                            Bảo vệ 100% giá trị đơn hàng
-                          </Typography>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Typography variant="body2" className="text-orange-600">
-                          +{formatPrice(10000)}
-                        </Typography>
-                        <Switch
-                          checked={insurance}
-                          onChange={(e) => setInsurance(e.target.checked)}
-                          color="primary"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between rounded-lg border p-3">
-                      <div className="flex items-center gap-3">
-                        <Mail className="h-5 w-5 text-green-500" />
-                        <div>
-                          <Typography
-                            variant="subtitle2"
-                            className="font-medium"
-                          >
-                            Đăng ký nhận tin
-                          </Typography>
-                          <Typography
-                            variant="caption"
-                            className="text-gray-600"
-                          >
-                            Nhận ưu đãi và cập nhật mới nhất
-                          </Typography>
-                        </div>
-                      </div>
-                      <Switch
-                        checked={newsletter}
-                        onChange={(e) => setNewsletter(e.target.checked)}
-                        color="primary"
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-
-            {/* Enhanced Order Note */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-              <Card className="overflow-hidden shadow-lg">
-                <CardContent className="p-6">
-                  <Typography variant="h6" className="mb-4 font-semibold">
-                    Ghi chú đơn hàng
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={3}
-                    placeholder="Ghi chú cho người bán (màu sắc, kích thước, yêu cầu đặc biệt...)"
-                    value={orderNote}
-                    onChange={(e) => setOrderNote(e.target.value)}
-                    variant="outlined"
-                    inputProps={{ maxLength: 500 }}
-                    helperText={`${orderNote.length}/500 ký tự`}
-                  />
-                </CardContent>
-              </Card>
-            </motion.div>
           </div>
 
           {/* Right Column - Enhanced Order Summary */}
@@ -1234,7 +993,7 @@ export default function CheckOutPage() {
                     <div className="flex justify-between">
                       <Typography variant="body2" className="text-gray-600">
                         Tạm tính (
-                        {mockProducts.reduce(
+                        {checkoutCart.reduce(
                           (total, p) => total + p.quantity,
                           0,
                         )}{" "}
@@ -1261,28 +1020,6 @@ export default function CheckOutPage() {
                         </Typography>
                         <Typography variant="body2" className="font-medium">
                           {formatPrice(paymentFee)}
-                        </Typography>
-                      </div>
-                    )}
-
-                    {giftWrapFee > 0 && (
-                      <div className="flex justify-between">
-                        <Typography variant="body2" className="text-gray-600">
-                          Gói quà:
-                        </Typography>
-                        <Typography variant="body2" className="font-medium">
-                          {formatPrice(giftWrapFee)}
-                        </Typography>
-                      </div>
-                    )}
-
-                    {insuranceFee > 0 && (
-                      <div className="flex justify-between">
-                        <Typography variant="body2" className="text-gray-600">
-                          Bảo hiểm:
-                        </Typography>
-                        <Typography variant="body2" className="font-medium">
-                          {formatPrice(insuranceFee)}
                         </Typography>
                       </div>
                     )}
@@ -1328,14 +1065,6 @@ export default function CheckOutPage() {
                         {formatPrice(totalAmount)}
                       </Typography>
                     </div>
-
-                    {totalSavings > 0 && (
-                      <div className="rounded-lg bg-green-50 p-2 text-center">
-                        <Typography variant="body2" className="text-green-700">
-                          🎉 Bạn đã tiết kiệm được {formatPrice(totalSavings)}!
-                        </Typography>
-                      </div>
-                    )}
                   </div>
 
                   {/* Order Info */}
@@ -1370,7 +1099,7 @@ export default function CheckOutPage() {
                       fullWidth
                       variant="contained"
                       size="large"
-                      className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 py-4 text-white shadow-lg hover:shadow-xl"
+                      className="!mb-1.5 bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 py-4 text-white shadow-lg hover:shadow-xl"
                       onClick={handlePlaceOrder}
                       disabled={loading}
                       startIcon={
@@ -1387,7 +1116,7 @@ export default function CheckOutPage() {
 
                   <Typography
                     variant="caption"
-                    className="mt-3 block text-center text-gray-500"
+                    className="mt-5 block text-center text-gray-500"
                   >
                     Bằng việc đặt hàng, bạn đồng ý với{" "}
                     <span className="cursor-pointer text-orange-600 underline">
@@ -1427,113 +1156,13 @@ export default function CheckOutPage() {
         </div>
 
         {/* Enhanced Address Dialog */}
-        <Dialog
+        <AddressDialog
+          dataAddresses={mockAddresses}
           open={showAddressDialog}
           onClose={() => setShowAddressDialog(false)}
-          maxWidth="md"
-          fullWidth
-        >
-          <DialogTitle className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-orange-500" />
-            Chọn địa chỉ giao hàng
-          </DialogTitle>
-          <DialogContent>
-            <div className="space-y-3 pt-2">
-              {mockAddresses.map((address) => (
-                <motion.div
-                  key={address.id}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <button
-                    type="button"
-                    className={`cursor-pointer rounded-lg border-2 p-4 transition-all ${
-                      selectedAddress.id === address.id
-                        ? "border-orange-300 bg-orange-50 shadow-md"
-                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                    }`}
-                    onClick={() => setSelectedAddress(address)}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="mb-2 flex items-center gap-2">
-                          <Typography
-                            variant="subtitle1"
-                            className="font-semibold"
-                          >
-                            {address.name}
-                          </Typography>
-                          <Typography variant="body2" className="text-gray-600">
-                            {address.phone}
-                          </Typography>
-                          <Chip
-                            label={
-                              address.type === "home"
-                                ? "Nhà riêng"
-                                : "Văn phòng"
-                            }
-                            size="small"
-                            icon={
-                              address.type === "home" ? (
-                                <Home className="h-3 w-3" />
-                              ) : (
-                                <Building2 className="h-3 w-3" />
-                              )
-                            }
-                          />
-                          {address.isDefault && (
-                            <Chip
-                              label="Mặc định"
-                              size="small"
-                              className="bg-green-100 text-green-700"
-                            />
-                          )}
-                        </div>
-                        <Typography
-                          variant="body2"
-                          className="mb-2 text-gray-700"
-                        >
-                          {address.address}, {address.ward}, {address.district},{" "}
-                          {address.province}
-                        </Typography>
-                        {address.coordinates && (
-                          <div className="flex items-center gap-1 text-xs text-gray-500">
-                            <MapIcon className="h-3 w-3" />
-                            <span>Đã xác minh vị trí</span>
-                          </div>
-                        )}
-                      </div>
-                      {selectedAddress.id === address.id && (
-                        <CheckCircle className="h-6 w-6 text-orange-500" />
-                      )}
-                    </div>
-                  </button>
-                </motion.div>
-              ))}
-            </div>
-            <Button
-              fullWidth
-              variant="outlined"
-              startIcon={<Plus />}
-              className="mt-4 border-dashed"
-              onClick={() => {
-                /* Add new address */
-              }}
-            >
-              Thêm địa chỉ mới
-            </Button>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setShowAddressDialog(false)}>Hủy</Button>
-            <Button
-              onClick={() => setShowAddressDialog(false)}
-              variant="contained"
-              className="bg-orange-500"
-            >
-              Xác nhận
-            </Button>
-          </DialogActions>
-        </Dialog>
+          selectedAddress={selectedAddress}
+          setSelectedAddress={setSelectedAddress}
+        />
 
         {/* Enhanced Voucher Dialog */}
         <Dialog
