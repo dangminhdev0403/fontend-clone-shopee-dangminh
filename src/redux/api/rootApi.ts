@@ -5,7 +5,7 @@ import { baseQueryWithReAuth } from "./baseQuery";
 export const rootApi = createApi({
   baseQuery: baseQueryWithReAuth,
   reducerPath: "api",
-  tagTypes: ["Cart"], // 👈 Thêm dòng này
+  tagTypes: ["Cart","ADDRESS"], // 👈 Thêm dòng này
 
   endpoints: () => ({}),
 });

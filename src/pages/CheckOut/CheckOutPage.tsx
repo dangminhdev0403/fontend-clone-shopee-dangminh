@@ -21,6 +21,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { AddressDTO, useGetAddressesQuery } from "@redux/api/addressApi";
 import { RootState } from "@redux/store";
 import { motion } from "framer-motion";
 import {
@@ -49,22 +50,10 @@ import {
   XCircle,
   Zap,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 
 // Enhanced Interfaces
-interface AddressDTO {
-  id: number;
-  name: string;
-  phone: string;
-  address: string;
-  ward: string;
-  district: string;
-  province: string;
-  isDefault: boolean;
-  type: "home" | "office" | "other";
-  coordinates?: { lat: number; lng: number };
-}
 
 interface PaymentMethodDTO {
   id: string;
@@ -101,67 +90,6 @@ interface ShippingOptionDTO {
   features: string[];
   isRecommended?: boolean;
 }
-
-// Enhanced Mock Data
-const mockAddresses: AddressDTO[] = [
-  {
-    id: 1,
-    name: "Nguyễn Văn A",
-    phone: "0123456789",
-    address: "Số 1, Đường ABC",
-    ward: "Phường 1",
-    district: "Quận 1",
-    province: "TP.HCM",
-    type: "home",
-    isDefault: true,
-  },
-  {
-    id: 2,
-    name: "Nguyễn Thị B",
-    phone: "0987654321",
-    address: "Tầng 5, Tòa nhà XYZ",
-    ward: "Phường 2",
-    district: "Quận 3",
-    province: "TP.HCM",
-    type: "office",
-    isDefault: false,
-    coordinates: { lat: 10.762622, lng: 106.660172 },
-  },
-  {
-    id: 3,
-    name: "Trần Văn C",
-    phone: "0369852147",
-    address: "123 Đường Lê Lợi",
-    ward: "Phường Bến Nghé",
-    district: "Quận 1",
-    province: "TP.HCM",
-    type: "home",
-    isDefault: false,
-  },
-  {
-    id: 4,
-    name: "Lê Thị D",
-    phone: "0912345678",
-    address: "456 Nguyễn Huệ",
-    ward: "Phường Nguyễn Thái Bình",
-    district: "Quận 1",
-    province: "TP.HCM",
-    type: "office",
-    isDefault: false,
-    coordinates: { lat: 10.776889, lng: 106.700806 },
-  },
-  {
-    id: 5,
-    name: "Phạm Văn E",
-    phone: "0778899001",
-    address: "789 Võ Văn Tần",
-    ward: "Phường 6",
-    district: "Quận 3",
-    province: "TP.HCM",
-    type: "other",
-    isDefault: false,
-  },
-];
 
 const mockPaymentMethods: PaymentMethodDTO[] = [
   {
@@ -279,11 +207,16 @@ const mockVouchers: VoucherDTO[] = [
 
 export default function CheckOutPage() {
   // States
+  // api Redux
+  const { data, isLoading: isLoadingAddresses } = useGetAddressesQuery();
+  const addresses: AddressDTO[] = useMemo(() => data ?? [], [data]);
+
   const checkoutCart = useSelector((state: RootState) => state.checkout.cart);
 
-  const [selectedAddress, setSelectedAddress] = useState<AddressDTO>(
-    mockAddresses[0],
+  const [selectedAddress, setSelectedAddress] = useState<AddressDTO | null>(
+    null,
   );
+
   const [selectedPayment, setSelectedPayment] = useState<string>("momo");
   const [selectedShipping, setSelectedShipping] = useState<string>("express");
   const [showAddressDialog, setShowAddressDialog] = useState(false);
@@ -308,6 +241,9 @@ export default function CheckOutPage() {
 
   // Simulate page loading
   useEffect(() => {
+    if (addresses.length > 0 && !selectedAddress) {
+      setSelectedAddress(addresses[0]);
+    }
     setTimeout(() => setPageLoading(false), 1500);
 
     // Calculate estimated delivery
@@ -321,7 +257,7 @@ export default function CheckOutPage() {
       delivery.setDate(delivery.getDate() + days);
       setEstimatedDelivery(delivery);
     }
-  }, [selectedShipping]);
+  }, [addresses, selectedAddress, selectedShipping]);
 
   // Calculations
   const subtotal = checkoutCart.reduce(
@@ -487,6 +423,7 @@ export default function CheckOutPage() {
                         icon={<CheckCircle className="h-3 w-3" />}
                       />
                     </div>
+
                     <Button
                       variant="outlined"
                       size="small"
@@ -494,70 +431,78 @@ export default function CheckOutPage() {
                       onClick={() => setShowAddressDialog(true)}
                       className="hover:bg-orange-50"
                     >
-                      Thay đổi
+                      {selectedAddress ? "Thay đổi" : "Thêm điểm giao hàng"}
                     </Button>
                   </div>
 
-                  <Box className="rounded-lg border-2 border-orange-200 bg-gradient-to-r from-orange-50 to-red-50 p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="mb-2 flex items-center gap-2">
-                          <Typography
-                            variant="subtitle1"
-                            className="font-semibold"
-                          >
-                            {selectedAddress.name}
-                          </Typography>
-                          <Typography variant="body2" className="text-gray-600">
-                            {selectedAddress.phone}
-                          </Typography>
-                          <Chip
-                            label={
-                              selectedAddress.type === "home"
-                                ? "Nhà riêng"
-                                : "Văn phòng"
-                            }
-                            size="small"
-                            icon={
-                              selectedAddress.type === "home" ? (
-                                <Home className="h-3 w-3" />
-                              ) : (
-                                <Building2 className="h-3 w-3" />
-                              )
-                            }
-                            className="bg-orange-100 text-orange-700"
-                          />
-                          {selectedAddress.isDefault && (
+                  {selectedAddress?.name ? (
+                    <Box className="rounded-lg border-2 border-orange-200 bg-gradient-to-r from-orange-50 to-red-50 p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="mb-2 flex items-center gap-2">
+                            <Typography
+                              variant="subtitle1"
+                              className="font-semibold"
+                            >
+                              {selectedAddress?.name}
+                            </Typography>
+                            <Typography
+                              variant="body2"
+                              className="text-gray-600"
+                            >
+                              {selectedAddress?.phone}
+                            </Typography>
                             <Chip
-                              label="Mặc định"
+                              label={
+                                selectedAddress?.type === "home"
+                                  ? "Nhà riêng"
+                                  : "Văn phòng"
+                              }
                               size="small"
-                              className="bg-green-100 text-green-700"
+                              icon={
+                                selectedAddress?.type === "home" ? (
+                                  <Home className="h-3 w-3" />
+                                ) : (
+                                  <Building2 className="h-3 w-3" />
+                                )
+                              }
+                              className="bg-orange-100 text-orange-700"
                             />
-                          )}
-                        </div>
-                        <Typography
-                          variant="body2"
-                          className="mb-2 text-gray-700"
-                        >
-                          {selectedAddress.address}, {selectedAddress.ward},{" "}
-                          {selectedAddress.district}, {selectedAddress.province}
-                        </Typography>
-                        <div className="flex items-center gap-4 text-sm text-gray-600">
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
-                            <span>
-                              Giao hàng:{" "}
-                              {estimatedDelivery.toLocaleDateString("vi-VN")}
-                            </span>
+                            {selectedAddress?.isDefault && (
+                              <Chip
+                                label="Mặc định"
+                                size="small"
+                                className="bg-green-100 text-green-700"
+                              />
+                            )}
                           </div>
-                          <div className="flex items-center gap-1">
-                            <MapIcon className="h-3 w-3" />
-                            <span>Khoảng cách: 5.2km</span>
+                          <Typography
+                            variant="body2"
+                            className="mb-2 text-gray-700"
+                          >
+                            {selectedAddress?.fullAddress}
+                          </Typography>
+                          <div className="flex items-center gap-4 text-sm text-gray-600">
+                            <div className="flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              <span>
+                                Giao hàng:{" "}
+                                {estimatedDelivery.toLocaleDateString("vi-VN")}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <MapIcon className="h-3 w-3" />
+                              <span>Khoảng cách: 5.2km</span>
+                            </div>
                           </div>
                         </div>
                       </div>
+                    </Box>
+                  ) : (
+                    <div className="text-center text-gray-600">
+                      Bạn chưa có địa chỉ
                     </div>
-                  </Box>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
@@ -584,7 +529,7 @@ export default function CheckOutPage() {
                   </div>
 
                   <div className="space-y-4">
-                    {checkoutCart.map((product, index) => (
+                    {(checkoutCart || []).map((product, index) => (
                       <motion.div
                         key={product.id}
                         initial={{ opacity: 0, y: 20 }}
@@ -1157,10 +1102,11 @@ export default function CheckOutPage() {
 
         {/* Enhanced Address Dialog */}
         <AddressDialog
-          dataAddresses={mockAddresses}
+          isLoadingAddresses={isLoadingAddresses}
+          dataAddresses={addresses}
           open={showAddressDialog}
           onClose={() => setShowAddressDialog(false)}
-          selectedAddress={selectedAddress}
+          selectedAddress={selectedAddress ?? addresses[0]}
           setSelectedAddress={setSelectedAddress}
         />
 

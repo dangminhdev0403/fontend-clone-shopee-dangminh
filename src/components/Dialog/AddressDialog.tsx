@@ -3,6 +3,7 @@
 import {
   Button,
   Chip,
+  CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
@@ -14,7 +15,12 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { addressApi } from "@redux/api/addressApi";
+import {
+  addressApi,
+  type AddressDTO,
+  useCreateAddressMutation,
+  useUpdateAddressMutation,
+} from "@redux/api/addressApi";
 import { motion } from "framer-motion";
 import {
   Building2,
@@ -27,25 +33,13 @@ import {
 import { useState } from "react";
 import { toast } from "react-toastify";
 
-interface Address {
-  id: number;
-  name: string;
-  phone: string;
-  address: string;
-  ward: string;
-  district: string;
-  province: string;
-  isDefault: boolean;
-  type: "home" | "office" | "other";
-  coordinates?: { lat: number; lng: number };
-}
-
 interface Props {
+  isLoadingAddresses: boolean;
   open: boolean;
   onClose: () => void;
-  dataAddresses: Address[];
-  selectedAddress: Address;
-  setSelectedAddress: (address: Address) => void;
+  dataAddresses: AddressDTO[];
+  selectedAddress: AddressDTO;
+  setSelectedAddress: (address: AddressDTO) => void;
 }
 
 export default function AddressDialog({
@@ -55,72 +49,116 @@ export default function AddressDialog({
   selectedAddress,
   setSelectedAddress,
 }: Props) {
-  
   const [isAddingNew, setIsAddingNew] = useState(false);
-  const [newAddress, setNewAddress] = useState<Address>({
+  const [createAddress, { isLoading: isCreatingAddress }] =
+    useCreateAddressMutation();
+  const [updateAddress, { isLoading: isUpdatingAddress }] =
+    useUpdateAddressMutation();
+  const [newAddress, setNewAddress] = useState<AddressDTO>({
     id: 0,
     name: "",
     phone: "",
-    address: "",
-    ward: "",
-    district: "",
-    province: "",
+    addressDetail: "",
+    provinceId: 0,
+    districtId: 0,
+    wardId: 0,
+    fullAddress: "",
     isDefault: false,
     type: "home",
   });
-  const { data: provinces = [] } = addressApi.useGetProvincesQuery();
-  const { data: districts = [] } = addressApi.useGetDistrictsQuery(
-    Number(newAddress.province), // phải ép kiểu số vì backend yêu cầu ID
-    { skip: !newAddress.province }, // không gọi nếu chưa có tỉnh
-  );
-  const { data: wards = [] } = addressApi.useGetWardsQuery(
-    Number(newAddress.district),
-    { skip: !newAddress.district },
-  );
+  const [action, setAction] = useState<"add" | "edit">("add");
+
+  const { data: provinces = [], isLoading: isLoadingProvinces } =
+    addressApi.useGetProvincesQuery();
+  const { data: districts = [], isLoading: isLoadingDistricts } =
+    addressApi.useGetDistrictsQuery(
+      Number(newAddress.provinceId), // phải ép kiểu số vì backend yêu cầu ID
+      { skip: !newAddress.provinceId }, // không gọi nếu chưa có tỉnh
+    );
+  const { data: wards = [], isLoading: isLoadingWards } =
+    addressApi.useGetWardsQuery(Number(newAddress.districtId), {
+      skip: !newAddress.districtId,
+    });
 
   const handleConfirm = () => {
     if (isAddingNew) {
       const newId = Date.now();
       const fullAddress = { ...newAddress, id: newId };
-
       setSelectedAddress(fullAddress);
       setIsAddingNew(false);
     }
     onClose();
   };
 
-  const handleSaveAddress = () => {
-    if (!newAddress.name || !newAddress.phone || !newAddress.address) {
+  const handleSaveAddress = async () => {
+    if (
+      !newAddress.name ||
+      !newAddress.phone ||
+      !newAddress.addressDetail ||
+      newAddress.provinceId == 0 ||
+      newAddress.districtId == 0 ||
+      newAddress.wardId == 0
+    ) {
       toast.error("Vui lòng điền đầy đủ thông tin địa chỉ.");
       return;
     }
-    toast.success("Địa chỉ đã được lưu thành công!");
-    setIsAddingNew(false);
+
+    if (isNaN(Number(newAddress.phone))) {
+      toast.error("Số điện thoại phải là số.");
+      return;
+    }
+
+    if (newAddress.phone.length !== 10) {
+      toast.error("Số điện thoại phải có 10 số.");
+      return;
+    }
+
+    try {
+      if (action === "add") {
+        await createAddress(newAddress).unwrap();
+        toast.success("Địa chỉ đã được lưu thành công!");
+      } else if (action === "edit") {
+        await updateAddress(newAddress).unwrap();
+        toast.success("Địa chỉ đã được cập nhật thành công!");
+        // Cập nhật selectedAddress nếu đang edit địa chỉ được chọn
+        if (selectedAddress.id === newAddress.id) {
+          setSelectedAddress(newAddress);
+        }
+      }
+      setIsAddingNew(false);
+    } catch (error) {
+      console.log(error);
+      if (action === "add") {
+        toast.error("Có lỗi xảy ra khi lưu địa chỉ!");
+      } else {
+        toast.error("Có lỗi xảy ra khi cập nhật địa chỉ!");
+      }
+    }
   };
 
-  const handleProvinceChange = (value: string) => {
+  const handleProvinceChange = (value: number) => {
     setNewAddress({
       ...newAddress,
-      province: value,
-      district: "",
-      ward: "",
+      provinceId: value,
+      districtId: 0,
+      wardId: 0,
     });
     console.log("Selected Province:", value);
   };
 
-  const handleDistrictChange = (value: string) => {
+  const handleDistrictChange = (value: number) => {
     setNewAddress({
       ...newAddress,
-      district: value,
-      ward: "",
+      districtId: value,
+      wardId: 0,
     });
     console.log("Selected District:", value);
   };
 
-  const handleWardChange = (value: string) => {
+  const handleWardChange = (value: number) => {
     setNewAddress({
       ...newAddress,
-      ward: value,
+      wardId: value,
     });
     console.log("Selected Ward:", value);
   };
@@ -180,7 +218,9 @@ export default function AddressDialog({
                         ? "border-orange-400 bg-gradient-to-br from-orange-50 to-orange-100 shadow-md ring-2 ring-orange-100"
                         : "border-gray-200 bg-white hover:border-orange-200 hover:bg-orange-50/50 hover:shadow-sm"
                     }`}
-                    onClick={() => setSelectedAddress(address)}
+                    onClick={() => {
+                      setSelectedAddress(address);
+                    }}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1 text-left">
@@ -254,15 +294,12 @@ export default function AddressDialog({
                             />
                           )}
                         </div>
-
                         <Typography
                           variant="body2"
                           className="mb-2 text-sm leading-relaxed text-gray-700"
                         >
-                          {address.address}, {address.ward}, {address.district},{" "}
-                          {address.province}
+                          {address.fullAddress}
                         </Typography>
-
                         {address.coordinates && (
                           <div className="flex inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-1 text-xs text-blue-600">
                             <MapIcon className="h-3 w-3" />
@@ -273,21 +310,34 @@ export default function AddressDialog({
                         )}
                       </div>
 
-                      {selectedAddress.id === address.id && (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{
-                            type: "spring",
-                            stiffness: 500,
-                            damping: 30,
+                      <div className="flex gap-2">
+                        {selectedAddress.id === address.id && (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{
+                              type: "spring",
+                              stiffness: 500,
+                              damping: 30,
+                            }}
+                          >
+                            <div className="rounded-full bg-orange-500 p-1.5">
+                              <CheckCircle className="h-5 w-5 text-white" />
+                            </div>
+                          </motion.div>
+                        )}
+                        <span
+                          className="text-amber-600"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setNewAddress(address);
+                            setIsAddingNew(true);
+                            setAction("edit");
                           }}
                         >
-                          <div className="rounded-full bg-orange-500 p-1.5">
-                            <CheckCircle className="h-5 w-5 text-white" />
-                          </div>
-                        </motion.div>
-                      )}
+                          Chỉnh sửa
+                        </span>
+                      </div>
                     </div>
                   </button>
                 </motion.div>
@@ -309,13 +359,14 @@ export default function AddressDialog({
                     id: 0,
                     name: "",
                     phone: "",
-                    address: "",
-                    ward: "",
-                    district: "",
-                    province: "",
+                    addressDetail: "",
+                    wardId: 0,
+                    districtId: 0,
+                    provinceId: 0,
                     isDefault: false,
                     type: "home",
                   });
+                  setAction("add");
                 }}
                 sx={{
                   mt: 4,
@@ -350,10 +401,12 @@ export default function AddressDialog({
           >
             <div className="mb-6">
               <Typography variant="h6" className="mb-2 font-bold text-gray-800">
-                Thêm địa chỉ mới
+                {action === "add" ? "Thêm địa chỉ mới" : "Cập nhật địa chỉ"}
               </Typography>
               <Typography variant="body2" className="text-gray-600">
-                Điền thông tin địa chỉ giao hàng mới của bạn
+                {action === "add"
+                  ? "Điền thông tin địa chỉ giao hàng mới của bạn"
+                  : "Cập nhật thông tin địa chỉ giao hàng của bạn"}
               </Typography>
             </div>
 
@@ -367,6 +420,7 @@ export default function AddressDialog({
                     setNewAddress({ ...newAddress, name: e.target.value })
                   }
                   variant="outlined"
+                  disabled={isCreatingAddress || isUpdatingAddress}
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       borderRadius: "12px",
@@ -390,6 +444,7 @@ export default function AddressDialog({
                     setNewAddress({ ...newAddress, phone: e.target.value })
                   }
                   variant="outlined"
+                  disabled={isCreatingAddress || isUpdatingAddress}
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       borderRadius: "12px",
@@ -410,11 +465,15 @@ export default function AddressDialog({
               <TextField
                 label="Địa chỉ cụ thể (số nhà, tên đường...)"
                 fullWidth
-                value={newAddress.address}
+                value={newAddress.addressDetail}
                 onChange={(e) =>
-                  setNewAddress({ ...newAddress, address: e.target.value })
+                  setNewAddress({
+                    ...newAddress,
+                    addressDetail: e.target.value,
+                  })
                 }
                 variant="outlined"
+                disabled={isCreatingAddress || isUpdatingAddress}
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     borderRadius: "12px",
@@ -445,9 +504,16 @@ export default function AddressDialog({
                   </InputLabel>
                   <Select
                     labelId="province-label"
-                    value={newAddress.province}
+                    value={newAddress.provinceId || ""}
                     label="Tỉnh/Thành phố"
-                    onChange={(e) => handleProvinceChange(e.target.value)}
+                    onChange={(e) =>
+                      handleProvinceChange(e.target.value as number)
+                    }
+                    disabled={
+                      isCreatingAddress ||
+                      isUpdatingAddress ||
+                      isLoadingProvinces
+                    }
                     sx={{
                       borderRadius: "12px",
                       "& .MuiOutlinedInput-notchedOutline": {
@@ -461,6 +527,16 @@ export default function AddressDialog({
                       },
                     }}
                   >
+                    <MenuItem value={0} disabled>
+                      {isLoadingProvinces ? (
+                        <div className="flex items-center gap-2">
+                          <CircularProgress size={16} />
+                          <span>Đang tải...</span>
+                        </div>
+                      ) : (
+                        "Chọn tỉnh/thành"
+                      )}
+                    </MenuItem>
                     {provinces.map((province) => (
                       <MenuItem key={province.id} value={province.id}>
                         {province.name}
@@ -482,11 +558,40 @@ export default function AddressDialog({
                   </InputLabel>
                   <Select
                     labelId="district-label"
-                    value={newAddress.district}
+                    value={newAddress.districtId || ""}
                     label="Quận/Huyện"
-                    onChange={(e) => handleDistrictChange(e.target.value)}
-                    disabled={!newAddress.province}
+                    onChange={(e) =>
+                      handleDistrictChange(e.target.value as number)
+                    }
+                    disabled={
+                      !newAddress.provinceId ||
+                      isCreatingAddress ||
+                      isUpdatingAddress ||
+                      isLoadingDistricts
+                    }
+                    sx={{
+                      borderRadius: "12px",
+                      "& .MuiOutlinedInput-notchedOutline": {
+                        borderRadius: "12px",
+                      },
+                      "&:hover .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "#ff6b35",
+                      },
+                      "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                        borderColor: "#ff6b35",
+                      },
+                    }}
                   >
+                    <MenuItem value={0} disabled>
+                      {isLoadingDistricts ? (
+                        <div className="flex items-center gap-2">
+                          <CircularProgress size={16} />
+                          <span>Đang tải...</span>
+                        </div>
+                      ) : (
+                        "Chọn quận/huyện"
+                      )}
+                    </MenuItem>
                     {districts.map((district) => (
                       <MenuItem key={district.id} value={district.id}>
                         {district.name}
@@ -508,10 +613,15 @@ export default function AddressDialog({
                   </InputLabel>
                   <Select
                     labelId="ward-label"
-                    value={newAddress.ward}
+                    value={newAddress.wardId || ""}
                     label="Phường/Xã"
                     onChange={(e) => handleWardChange(e.target.value)}
-                    disabled={!newAddress.district}
+                    disabled={
+                      !newAddress.districtId ||
+                      isCreatingAddress ||
+                      isUpdatingAddress ||
+                      isLoadingWards
+                    }
                     sx={{
                       borderRadius: "12px",
                       "& .MuiOutlinedInput-notchedOutline": {
@@ -525,6 +635,16 @@ export default function AddressDialog({
                       },
                     }}
                   >
+                    <MenuItem value={0} disabled>
+                      {isLoadingWards ? (
+                        <div className="flex items-center gap-2">
+                          <CircularProgress size={16} />
+                          <span>Đang tải...</span>
+                        </div>
+                      ) : (
+                        "Chọn phường/xã"
+                      )}
+                    </MenuItem>
                     {wards.map((ward) => (
                       <MenuItem key={ward.id} value={ward.id}>
                         {ward.name}
@@ -549,6 +669,7 @@ export default function AddressDialog({
           <>
             <Button
               onClick={() => setIsAddingNew(false)}
+              disabled={isCreatingAddress || isUpdatingAddress}
               sx={{
                 borderRadius: "10px",
                 textTransform: "none",
@@ -566,6 +687,7 @@ export default function AddressDialog({
             <Button
               onClick={handleSaveAddress}
               variant="contained"
+              disabled={isCreatingAddress || isUpdatingAddress}
               sx={{
                 borderRadius: "10px",
                 textTransform: "none",
@@ -579,9 +701,24 @@ export default function AddressDialog({
                     "linear-gradient(135deg, #f7931e 0%, #ff6b35 100%)",
                   boxShadow: "0 6px 20px rgba(255, 107, 53, 0.4)",
                 },
+                "&:disabled": {
+                  background: "#ccc",
+                  boxShadow: "none",
+                },
               }}
             >
-              Lưu địa chỉ
+              {isCreatingAddress || isUpdatingAddress ? (
+                <div className="flex items-center gap-2">
+                  <CircularProgress size={16} color="inherit" />
+                  <span>
+                    {action === "add" ? "Đang lưu..." : "Đang cập nhật..."}
+                  </span>
+                </div>
+              ) : action === "add" ? (
+                "Lưu địa chỉ"
+              ) : (
+                "Cập nhật địa chỉ"
+              )}
             </Button>
           </>
         ) : (

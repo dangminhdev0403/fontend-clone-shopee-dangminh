@@ -29,5 +29,6 @@ export const API_ROUTES = {
     PROVINCES: `${version}/provinces`,
     DISTRICTS: `${version}/districts`,
     WARDS: `${version}/wards`,
+    ADDRESSES: `${version}/addresses`,
   },
 };

@@ -35,9 +35,12 @@ export const baseQueryWithReAuth: BaseQueryFn<
   FetchBaseQueryError
 > = async (args, api, extraOptions) => {
   let result = await baseQuery(args, api, extraOptions);
-
-  const url = typeof args === "string" ? args : (args.url || "").toString();
-
+  const url: string = (() => {
+    if (typeof args === "string") return args;
+    if (typeof args === "object" && typeof args.url === "string")
+      return args.url;
+    return "";
+  })();
   if (result.error?.status === 401 && !url.includes(API_ROUTES.AUTH.LOGIN)) {
     const refreshResult = await baseQuery(
       {
