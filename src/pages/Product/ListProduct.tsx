@@ -9,7 +9,6 @@ import { useProductFilter } from "@hooks/useProductFilter";
 import { FormControl, MenuItem, OutlinedInput, Select } from "@mui/material";
 import Pagination from "@mui/material/Pagination";
 import ItemProduct from "@pages/Product/ItemProduct";
-import locationApi from "@service/location.service";
 import productApi from "@service/product.service";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { sorts } from "@utils/constants/response";
@@ -56,11 +55,6 @@ const ListProduct = () => {
     placeholderData: keepPreviousData,
   });
 
-  const { data: listProvince } = useQuery({
-    queryKey: ["provinces"],
-    queryFn: () => locationApi.getProvinces(),
-  });
-
   const { data: listCategory } = useQuery({
     queryKey: ["categories"],
     queryFn: () => productApi.getCategories(),
@@ -74,18 +68,6 @@ const ListProduct = () => {
         name: "Theo Danh Mục",
         value: listCategory?.content ?? [],
         type: "radio",
-      },
-    },
-  ];
-
-  const locationFilters = [
-    {
-      id: "province",
-      filter: {
-        key: "provinceId",
-        name: "Theo Tinh Thành",
-        value: listProvince?.content ?? [],
-        type: "checkbox",
       },
     },
   ];
@@ -118,9 +100,7 @@ const ListProduct = () => {
         {searchFilters.map((item) => (
           <CheckBoxFilter key={item.id} filterData={item.filter} />
         ))}
-        {locationFilters.map((item) => (
-          <CheckBoxFilter key={`${item.id}`} filterData={item.filter} />
-        ))}
+
         <button
           className="mt-2 w-full cursor-pointer rounded bg-[#ee4d2d] py-2 text-sm text-white hover:opacity-90"
           onClick={resetFilter}

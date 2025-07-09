@@ -124,15 +124,6 @@ const mockPaymentMethods: PaymentMethodDTO[] = [
     benefits: ["Kiểm tra hàng", "An toàn 100%"],
   },
   {
-    id: "installment",
-    name: "Trả góp 0% lãi suất",
-    type: "installment",
-    icon: CreditCard,
-    description: "Chia nhỏ thanh toán, không lãi suất",
-    processingTime: "1-2 phút",
-    benefits: ["0% lãi suất", "Duyệt nhanh", "Linh hoạt kỳ hạn"],
-  },
-  {
     id: "bank",
     name: "Chuyển khoản ngân hàng",
     type: "bank",

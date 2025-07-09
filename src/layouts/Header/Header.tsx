@@ -173,28 +173,30 @@ const Header = () => {
           </div>
 
           <div className="group mr-auto min-w-10 cursor-pointer">
-            <DropdownMenu
-              label="6"
-              icon={
-                <FontAwesomeIcon
-                  icon={faCartShopping}
-                  size="lg"
-                  className="relative z-20 my-auto rounded-full border border-white p-2 text-white"
-                />
-              }
-              isCard={true}
-              items={cart?.cartDetails || []}
-              popsition="ml-[51px] w-[300px] left-[-19rem]"
-              renderItem={(item) => (
-                <ItemDropCard
-                  id={item.id.toString()}
-                  name={item.product.name}
-                  price={item.product.price}
-                  imageUrl={item.product.imageUrl}
-                  onItemClick={(id) => handleCartClick(id)}
-                />
-              )}
-            />
+            {auth.isAuthenticated && (
+              <DropdownMenu
+                label={`${cart?.cartDetails?.length ?? 0}`}
+                icon={
+                  <FontAwesomeIcon
+                    icon={faCartShopping}
+                    size="lg"
+                    className="relative z-20 my-auto rounded-full border border-white p-2 text-white"
+                  />
+                }
+                isCard={true}
+                items={cart?.cartDetails || []}
+                popsition="ml-[51px] w-[300px] left-[-19rem]"
+                renderItem={(item) => (
+                  <ItemDropCard
+                    id={item.id.toString()}
+                    name={item.product.name}
+                    price={item.product.price}
+                    imageUrl={item.product.imageUrl}
+                    onItemClick={(id) => handleCartClick(id)}
+                  />
+                )}
+              />
+            )}
           </div>
         </div>
       </div>
