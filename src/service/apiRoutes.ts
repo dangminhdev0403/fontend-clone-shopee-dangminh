@@ -1,4 +1,6 @@
 const version = `/api/v1`;
+const apiLocation =
+  "https://online-gateway.ghn.vn/shiip/public-api/master-data";
 export const API_ROUTES = {
   AUTH: {
     LOGIN: `${version}/auth/login`,
@@ -17,18 +19,15 @@ export const API_ROUTES = {
   CATEGORY: {
     LIST: `${version}/categories`,
   },
-  LOCATION: {
-    PROVINCES: `${version}/provinces`,
-  },
   CART: {
     GET: `${version}/products/get-cart`,
     ADD: `${version}/products/add-to-cart`,
     REMOVE: `${version}/products/remove-from-cart`,
   },
   ADDRESS: {
-    PROVINCES: `${version}/provinces`,
-    DISTRICTS: `${version}/districts`,
-    WARDS: `${version}/wards`,
+    PROVINCES: `${apiLocation}/province`,
+    DISTRICTS: `${apiLocation}/district`,
+    WARDS: `${apiLocation}/ward`,
     ADDRESSES: `${version}/addresses`,
   },
 };

@@ -16,6 +16,9 @@ export const instance: AxiosInstance = axios.create({
 // Request interceptor
 instance.interceptors.request.use(
   function (config) {
+    if (config.url?.includes("ghn.vn")) {
+      config.headers["token"] = proccess.VITE_GHN_TOKEN;
+    }
     return config;
   },
   function (error: AxiosError) {

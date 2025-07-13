@@ -16,11 +16,12 @@ import {
   Typography,
 } from "@mui/material";
 import {
-  addressApi,
   type AddressDTO,
   useCreateAddressMutation,
   useUpdateAddressMutation,
 } from "@redux/api/addressApi";
+import locationApi from "@service/location.service";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
   Building2,
@@ -68,17 +69,48 @@ export default function AddressDialog({
   });
   const [action, setAction] = useState<"add" | "edit">("add");
 
-  const { data: provinces = [], isLoading: isLoadingProvinces } =
-    addressApi.useGetProvincesQuery();
-  const { data: districts = [], isLoading: isLoadingDistricts } =
-    addressApi.useGetDistrictsQuery(
-      Number(newAddress.provinceId), // phải ép kiểu số vì backend yêu cầu ID
-      { skip: !newAddress.provinceId }, // không gọi nếu chưa có tỉnh
-    );
-  const { data: wards = [], isLoading: isLoadingWards } =
-    addressApi.useGetWardsQuery(Number(newAddress.districtId), {
-      skip: !newAddress.districtId,
-    });
+  // Tỉnh
+  const { data: provinces = [], isLoading: isLoadingProvinces } = useQuery({
+    queryKey: ["provinces"],
+    queryFn: () => locationApi.getProvinces(),
+    placeholderData: keepPreviousData,
+  });
+
+  // Quận/Huyện
+  const { data: districts = [], isLoading: isLoadingDistricts } = useQuery({
+    queryKey: ["districts", newAddress.provinceId],
+    queryFn: async () => {
+      if (!newAddress.provinceId) {
+        return {
+          code: 200,
+          message: "No province selected",
+          data: [],
+        };
+      }
+      return locationApi.getDistricts(newAddress.provinceId);
+    },
+    enabled: !!newAddress.provinceId,
+    placeholderData: keepPreviousData,
+    select: (response) => response ?? [],
+  });
+
+  // Phường/Xã
+  const { data: wards = [], isLoading: isLoadingWards } = useQuery({
+    queryKey: ["wards", newAddress.districtId],
+    queryFn: async () => {
+      if (!newAddress.districtId) {
+        return {
+          code: 200,
+          message: "No district selected",
+          data: [],
+        };
+      }
+      return locationApi.getWards(newAddress.districtId);
+    },
+    enabled: !!newAddress.districtId,
+    placeholderData: keepPreviousData,
+    select: (response) => response ?? [],
+  });
 
   const handleConfirm = () => {
     if (isAddingNew) {
@@ -538,8 +570,11 @@ export default function AddressDialog({
                       )}
                     </MenuItem>
                     {provinces.map((province) => (
-                      <MenuItem key={province.id} value={province.id}>
-                        {province.name}
+                      <MenuItem
+                        key={province.ProvinceID}
+                        value={province.ProvinceID}
+                      >
+                        {province.ProvinceName}
                       </MenuItem>
                     ))}
                   </Select>
@@ -593,8 +628,11 @@ export default function AddressDialog({
                       )}
                     </MenuItem>
                     {districts.map((district) => (
-                      <MenuItem key={district.id} value={district.id}>
-                        {district.name}
+                      <MenuItem
+                        key={district.DistrictID}
+                        value={district.DistrictID}
+                      >
+                        {district.DistrictName}
                       </MenuItem>
                     ))}
                   </Select>
@@ -646,8 +684,8 @@ export default function AddressDialog({
                       )}
                     </MenuItem>
                     {wards.map((ward) => (
-                      <MenuItem key={ward.id} value={ward.id}>
-                        {ward.name}
+                      <MenuItem key={ward.WardCode} value={ward.WardCode}>
+                        {ward.WardName}
                       </MenuItem>
                     ))}
                   </Select>
