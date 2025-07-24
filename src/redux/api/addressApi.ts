@@ -14,7 +14,7 @@ export interface AddressDTO {
   addressDetail: string;
   provinceId: number;
   districtId: number;
-  wardId: number;
+  wardId: string;
   isDefault?: boolean;
   type: "home" | "office" | "other";
   fullAddress?: string;

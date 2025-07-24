@@ -62,7 +62,7 @@ export default function AddressDialog({
     addressDetail: "",
     provinceId: 0,
     districtId: 0,
-    wardId: 0,
+    wardId: "0",
     fullAddress: "",
     isDefault: false,
     type: "home",
@@ -121,6 +121,27 @@ export default function AddressDialog({
     }
     onClose();
   };
+  const updateFullAddress = (partialAddress: AddressDTO) => {
+    const provinceArr = Array.isArray(provinces)
+      ? provinces
+      : (provinces?.data ?? []);
+    const districtArr = Array.isArray(districts)
+      ? districts
+      : (districts?.data ?? []);
+    const wardArr = Array.isArray(wards) ? wards : (wards?.data ?? []);
+
+    const province =
+      provinceArr.find((p) => p.ProvinceID === partialAddress.provinceId)
+        ?.ProvinceName || "";
+    const district =
+      districtArr.find((d) => d.DistrictID === partialAddress.districtId)
+        ?.DistrictName || "";
+    const ward =
+      wardArr.find((w) => String(w.WardCode) === String(partialAddress.wardId))
+        ?.WardName || "";
+
+    return `${partialAddress.addressDetail}, ${ward}, ${district}, ${province}`;
+  };
 
   const handleSaveAddress = async () => {
     if (
@@ -129,7 +150,7 @@ export default function AddressDialog({
       !newAddress.addressDetail ||
       newAddress.provinceId == 0 ||
       newAddress.districtId == 0 ||
-      newAddress.wardId == 0
+      newAddress.wardId == "0"
     ) {
       toast.error("Vui lòng điền đầy đủ thông tin địa chỉ.");
       return;
@@ -166,33 +187,47 @@ export default function AddressDialog({
         toast.error("Có lỗi xảy ra khi cập nhật địa chỉ!");
       }
     }
+    console.log("New Address:", newAddress);
   };
 
   const handleProvinceChange = (value: number) => {
-    setNewAddress({
+    const updatedAddress = {
       ...newAddress,
       provinceId: value,
       districtId: 0,
-      wardId: 0,
-    });
-    console.log("Selected Province:", value);
+      wardId: "0",
+    };
+    setNewAddress((prev) => ({
+      ...prev,
+      provinceId: value,
+      districtId: 0,
+      wardId: "0",
+      fullAddress: updateFullAddress(updatedAddress),
+    }));
   };
-
   const handleDistrictChange = (value: number) => {
-    setNewAddress({
+    const updatedAddress = {
       ...newAddress,
       districtId: value,
-      wardId: 0,
+      wardId: "0",
+    };
+
+    setNewAddress({
+      ...updatedAddress,
+      fullAddress: updateFullAddress(updatedAddress),
     });
-    console.log("Selected District:", value);
   };
 
   const handleWardChange = (value: number) => {
-    setNewAddress({
+    const updatedAddress = {
       ...newAddress,
-      wardId: value,
+      wardId: value ? String(value) : "0",
+    };
+
+    setNewAddress({
+      ...updatedAddress,
+      fullAddress: updateFullAddress(updatedAddress),
     });
-    console.log("Selected Ward:", value);
   };
 
   return (
@@ -268,6 +303,12 @@ export default function AddressDialog({
                             className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600"
                           >
                             {address.phone}
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600"
+                          >
+                            {address.fullAddress}
                           </Typography>
                           <Chip
                             label={
@@ -392,7 +433,7 @@ export default function AddressDialog({
                     name: "",
                     phone: "",
                     addressDetail: "",
-                    wardId: 0,
+                    wardId: "0",
                     districtId: 0,
                     provinceId: 0,
                     isDefault: false,

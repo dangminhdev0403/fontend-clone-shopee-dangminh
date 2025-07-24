@@ -30,7 +30,10 @@ export const cartApi = rootApi.injectEndpoints({
       providesTags: ["Cart"],
     }),
 
-    addToCart: builder.mutation<void, { productId: number; quantity: number;  action:"INCREASE" | "DECREASE"}>({
+    addToCart: builder.mutation<
+      void,
+      { productId: number; quantity: number; action: "INCREASE" | "DECREASE" }
+    >({
       query: (body) => ({
         url: API_ROUTES.CART.ADD,
         method: "POST",
@@ -50,4 +53,8 @@ export const cartApi = rootApi.injectEndpoints({
   overrideExisting: false,
 });
 
-export const { useGetCartQuery, useAddToCartMutation , useRemoveFromCartMutation } = cartApi;
+export const {
+  useGetCartQuery,
+  useAddToCartMutation,
+  useRemoveFromCartMutation,
+} = cartApi;

@@ -21,8 +21,10 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { useShippingFee } from "@react-query/callApi";
 import { AddressDTO, useGetAddressesQuery } from "@redux/api/addressApi";
 import { RootState } from "@redux/store";
+import { GHNShippingFeeRequest } from "@service/product.service";
 import { motion } from "framer-motion";
 import {
   AlertTriangle,
@@ -40,7 +42,6 @@ import {
   Info,
   MapIcon,
   MapPin,
-  Package,
   RefreshCw,
   Shield,
   ShoppingBag,
@@ -67,30 +68,6 @@ interface PaymentMethodDTO {
   processingTime?: string;
   benefits?: string[];
 }
-
-interface VoucherDTO {
-  id: string;
-  code: string;
-  title: string;
-  discount: number;
-  type: "percentage" | "fixed" | "shipping";
-  minOrder: number;
-  maxDiscount?: number;
-  expiry: Date;
-  usageLimit?: number;
-  description: string;
-}
-
-interface ShippingOptionDTO {
-  id: string;
-  name: string;
-  price: number;
-  estimatedDays: string;
-  icon: React.ElementType;
-  features: string[];
-  isRecommended?: boolean;
-}
-
 const mockPaymentMethods: PaymentMethodDTO[] = [
   {
     id: "momo",
@@ -134,33 +111,28 @@ const mockPaymentMethods: PaymentMethodDTO[] = [
   },
 ];
 
-const mockShippingOptions: ShippingOptionDTO[] = [
-  {
-    id: "express",
-    name: "Giao hàng nhanh",
-    price: 45000,
-    estimatedDays: "1-2 ngày",
-    icon: Zap,
-    features: ["Giao trong ngày", "Theo dõi realtime", "Bảo hiểm 100%"],
-    isRecommended: true,
-  },
-  {
-    id: "standard",
-    name: "Giao hàng tiêu chuẩn",
-    price: 30000,
-    estimatedDays: "2-3 ngày",
-    icon: Truck,
-    features: ["Miễn phí với đơn >500k", "Theo dõi đơn hàng", "Bảo hiểm"],
-  },
-  {
-    id: "economy",
-    name: "Giao hàng tiết kiệm",
-    price: 20000,
-    estimatedDays: "3-5 ngày",
-    icon: Package,
-    features: ["Giá rẻ nhất", "Phù hợp đơn lớn"],
-  },
-];
+interface VoucherDTO {
+  id: string;
+  code: string;
+  title: string;
+  discount: number;
+  type: "percentage" | "fixed" | "shipping";
+  minOrder: number;
+  maxDiscount?: number;
+  expiry: Date;
+  usageLimit?: number;
+  description: string;
+}
+
+interface ShippingOptionDTO {
+  id: string;
+  name: string;
+  price: number;
+  estimatedDays: string;
+  icon: React.ElementType;
+  features: string[];
+  isRecommended?: boolean;
+}
 
 const mockVouchers: VoucherDTO[] = [
   {
@@ -214,7 +186,17 @@ export default function CheckOutPage() {
   const [showVoucherDialog, setShowVoucherDialog] = useState(false);
   const [voucherCode, setVoucherCode] = useState("");
   const [appliedVouchers, setAppliedVouchers] = useState<VoucherDTO[]>([]);
-
+  const [feeRequest, setFeeRequest] = useState<GHNShippingFeeRequest>({
+    service_id: 53321,
+    insurance_value: 500000,
+    from_district_id: 1542,
+    to_district_id: 1444,
+    to_ward_code: "20314",
+    height: 15,
+    length: 15,
+    weight: 1000,
+    width: 10,
+  });
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
   type NotificationType = "success" | "error" | "info" | "warning";
@@ -229,12 +211,43 @@ export default function CheckOutPage() {
   });
 
   const [estimatedDelivery, setEstimatedDelivery] = useState<Date>(new Date());
+  const { data: shippingFeeData, error: shippingFeeError } =
+    useShippingFee(feeRequest);
+  const mockShippingOptions: ShippingOptionDTO[] = useMemo(
+    () =>
+      shippingFeeData
+        ? [
+            {
+              id: "express",
+              name: "Giao hàng nhanh",
+              price: shippingFeeData.total || 0,
+              estimatedDays: "1-2 ngày",
+              icon: Zap,
+              features: [
+                "Giao trong ngày",
+                "Theo dõi realtime",
+                "Bảo hiểm 100%",
+              ],
+              isRecommended: true,
+            },
+          ]
+        : [],
+    [shippingFeeData],
+  );
 
   // Simulate page loading
   useEffect(() => {
     if (addresses.length > 0 && !selectedAddress) {
       setSelectedAddress(addresses[0]);
     }
+    if (!selectedAddress) return;
+    setFeeRequest((prev) => ({
+      ...prev,
+      to_district_id: selectedAddress.districtId,
+      to_ward_code: selectedAddress.wardId
+        ? String(selectedAddress.wardId)
+        : "",
+    }));
     setTimeout(() => setPageLoading(false), 1500);
 
     // Calculate estimated delivery
@@ -248,7 +261,7 @@ export default function CheckOutPage() {
       delivery.setDate(delivery.getDate() + days);
       setEstimatedDelivery(delivery);
     }
-  }, [addresses, selectedAddress, selectedShipping]);
+  }, [addresses, mockShippingOptions, selectedAddress, selectedShipping]);
 
   // Calculations
   const subtotal = checkoutCart.reduce(
@@ -596,71 +609,77 @@ export default function CheckOutPage() {
                     onChange={(e) => setSelectedShipping(e.target.value)}
                   >
                     <div className="space-y-3">
-                      {mockShippingOptions.map((option) => (
-                        <div
-                          key={option.id}
-                          className={`rounded-lg border-2 p-4 transition-all ${
-                            selectedShipping === option.id
-                              ? "border-orange-300 bg-orange-50"
-                              : "border-gray-200 hover:border-gray-300"
-                          }`}
-                        >
-                          <FormControlLabel
-                            value={option.id}
-                            control={<Radio sx={{ color: "orange.main" }} />}
-                            label={
-                              <div className="flex w-full items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                  <option.icon className="h-5 w-5 text-gray-600" />
-                                  <div>
-                                    <div className="flex items-center gap-2">
+                      {shippingFeeError ? (
+                        <Typography variant="body2" className="text-red-600">
+                          Không thể tính phí vận chuyển cho địa chỉ này.
+                        </Typography>
+                      ) : (
+                        mockShippingOptions.map((option) => (
+                          <div
+                            key={option.id}
+                            className={`rounded-lg border-2 p-4 transition-all ${
+                              selectedShipping === option.id
+                                ? "border-orange-300 bg-orange-50"
+                                : "border-gray-200 hover:border-gray-300"
+                            }`}
+                          >
+                            <FormControlLabel
+                              value={option.id}
+                              control={<Radio sx={{ color: "orange.main" }} />}
+                              label={
+                                <div className="flex w-full items-center justify-between">
+                                  <div className="flex items-center gap-3">
+                                    <option.icon className="h-5 w-5 text-gray-600" />
+                                    <div>
+                                      <div className="flex items-center gap-2">
+                                        <Typography
+                                          variant="subtitle1"
+                                          className="font-medium"
+                                        >
+                                          {option.name}
+                                        </Typography>
+                                        {option.isRecommended && (
+                                          <Chip
+                                            label="Đề xuất"
+                                            size="small"
+                                            className="bg-orange-100 text-orange-700"
+                                          />
+                                        )}
+                                      </div>
                                       <Typography
-                                        variant="subtitle1"
-                                        className="font-medium"
+                                        variant="body2"
+                                        className="text-gray-600"
                                       >
-                                        {option.name}
+                                        {option.estimatedDays}
                                       </Typography>
-                                      {option.isRecommended && (
-                                        <Chip
-                                          label="Đề xuất"
-                                          size="small"
-                                          className="bg-orange-100 text-orange-700"
-                                        />
-                                      )}
-                                    </div>
-                                    <Typography
-                                      variant="body2"
-                                      className="text-gray-600"
-                                    >
-                                      {option.estimatedDays}
-                                    </Typography>
-                                    <div className="mt-1 flex flex-wrap gap-1">
-                                      {option.features.map((feature, idx) => (
-                                        <Chip
-                                          key={idx}
-                                          label={feature}
-                                          size="small"
-                                          variant="outlined"
-                                          className="text-xs"
-                                        />
-                                      ))}
+                                      <div className="mt-1 flex flex-wrap gap-1">
+                                        {option.features.map((feature, idx) => (
+                                          <Chip
+                                            key={idx}
+                                            label={feature}
+                                            size="small"
+                                            variant="outlined"
+                                            className="text-xs"
+                                          />
+                                        ))}
+                                      </div>
                                     </div>
                                   </div>
+                                  <Typography
+                                    variant="h6"
+                                    className="font-bold text-orange-600"
+                                  >
+                                    {option.price === 0
+                                      ? "Miễn phí"
+                                      : formatPrice(option.price)}
+                                  </Typography>
                                 </div>
-                                <Typography
-                                  variant="h6"
-                                  className="font-bold text-orange-600"
-                                >
-                                  {option.price === 0
-                                    ? "Miễn phí"
-                                    : formatPrice(option.price)}
-                                </Typography>
-                              </div>
-                            }
-                            className="m-0 w-full"
-                          />
-                        </div>
-                      ))}
+                              }
+                              className="m-0 w-full"
+                            />
+                          </div>
+                        ))
+                      )}
                     </div>
                   </RadioGroup>
                 </CardContent>
