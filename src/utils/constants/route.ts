@@ -7,11 +7,24 @@ export const ROUTES = {
   CART: "/cart",
   CHECKOUT: "/checkout",
   ORDER_HISTORY: "/order-history",
+
   ADMIN: {
     BASE: "/admin",
-    DASHBOARD: "/dashboard",
-    PRODUCTS: "/products",
-    ORDERS: "/orders",
-    USERS: "/users",
+    CHILDREN: {
+      DASHBOARD: "", // index route
+      PRODUCTS: "products", // relative for router
+      ORDERS: "orders",
+      USERS: "users",
+      SETTING: "users",
+      ANALYTICS: "analytics",
+    },
+    ABS: {
+      DASHBOARD: "/admin",
+      PRODUCTS: "/admin/products",
+      ORDERS: "/admin/orders",
+      USERS: "/admin/users",
+      SETTING: "/admin/users",
+      ANALYTICS: "/admin/analytics",
+    },
   },
 };

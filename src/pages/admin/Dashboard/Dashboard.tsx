@@ -1,7 +1,8 @@
-import { formatPrice } from "@utils/helper";
+"use client";
+
+import { useRealtimeData } from "@hooks/useRealtimeData";
 import {
   Activity,
-  AreaChart,
   ArrowDownRight,
   ArrowUpRight,
   Award,
@@ -11,7 +12,6 @@ import {
   Flame,
   MoreHorizontal,
   Package,
-  PieChart,
   ShoppingCart,
   Star,
   Target,
@@ -19,26 +19,20 @@ import {
   Users,
   Zap,
 } from "lucide-react";
-import { useState } from "react";
 import {
   Area,
+  AreaChart,
   CartesianGrid,
   Cell,
   Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
-const generateRealtimeData = () => ({
-  totalProducts: 2847 + Math.floor(Math.random() * 100),
-  todayOrders: 156 + Math.floor(Math.random() * 50),
-  newCustomers: 89 + Math.floor(Math.random() * 20),
-  revenue: 125400000 + Math.floor(Math.random() * 10000000),
-  onlineUsers: 1247 + Math.floor(Math.random() * 100),
-  notifications: 12 + Math.floor(Math.random() * 5),
-});
-export const chartData = [
+
+const chartData = [
   { name: "T1", orders: 65, revenue: 2400, customers: 45 },
   { name: "T2", orders: 89, revenue: 3200, customers: 67 },
   { name: "T3", orders: 123, revenue: 4100, customers: 89 },
@@ -47,12 +41,14 @@ export const chartData = [
   { name: "T6", orders: 178, revenue: 6100, customers: 134 },
   { name: "T7", orders: 198, revenue: 7200, customers: 156 },
 ];
-export const pieData = [
+
+const pieData = [
   { name: "Điện thoại", value: 45, color: "#3B82F6" },
   { name: "Laptop", value: 25, color: "#10B981" },
   { name: "Phụ kiện", value: 20, color: "#F59E0B" },
   { name: "Khác", value: 10, color: "#EF4444" },
 ];
+
 const recentOrders = [
   {
     id: "DH001",
@@ -82,6 +78,7 @@ const recentOrders = [
     priority: "low",
   },
 ];
+
 const topProducts = [
   {
     name: "iPhone 15 Pro Max",
@@ -117,48 +114,17 @@ const topProducts = [
   },
 ];
 
-const products = [
-  {
-    id: "SP001",
-    name: "iPhone 15 Pro Max 256GB",
-    category: "Điện thoại",
-    price: 29990000,
-    originalPrice: 32990000,
-    stock: 45,
-    sold: 234,
-    rating: 4.8,
-    status: "active",
-    featured: true,
-  },
-  {
-    id: "SP002",
-    name: "Samsung Galaxy S24 Ultra",
-    category: "Điện thoại",
-    price: 26990000,
-    originalPrice: 29990000,
-    stock: 23,
-    sold: 189,
-    rating: 4.7,
-    status: "active",
-    featured: false,
-  },
-  {
-    id: "SP003",
-    name: "MacBook Air M3 13 inch",
-    category: "Laptop",
-    price: 28990000,
-    originalPrice: 31990000,
-    stock: 0,
-    sold: 156,
-    rating: 4.9,
-    status: "out_of_stock",
-    featured: true,
-  },
-];
-const Dashboard = () => {
-  const [realtimeData, setRealtimeData] = useState(generateRealtimeData());
+export function Dashboard() {
+  const realtimeData = useRealtimeData();
 
-  const getOrderStatusBadge = (status) => {
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(price);
+  };
+
+  const getOrderStatusBadge = (status: string) => {
     const statusConfig = {
       pending: {
         label: "Chờ xử lý",
@@ -177,7 +143,7 @@ const Dashboard = () => {
       },
     };
 
-    const config = statusConfig[status];
+    const config = statusConfig[status as keyof typeof statusConfig];
     const Icon = config.icon;
 
     return (
@@ -591,6 +557,4 @@ const Dashboard = () => {
       </div>
     </div>
   );
-};
-
-export default Dashboard;
+}

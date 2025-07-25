@@ -6,6 +6,11 @@ import Register from "@components/Register";
 import ProtectedRoute from "@components/RouteGuards/ProtectedRoute";
 import RejectRoute from "@components/RouteGuards/RejectRoute";
 import AdminLayout from "@layouts/AdminLayout";
+import Analytics from "@pages/admin/Analytics";
+import Dashboard from "@pages/admin/Dashboard";
+import Orders from "@pages/admin/Orders";
+import Products from "@pages/admin/Product";
+import UserManagement from "@pages/admin/UserManagement";
 import Auth from "@pages/Auth";
 import CheckOutPage from "@pages/CheckOut";
 import NotFound from "@pages/Errors/NotFound";
@@ -52,7 +57,29 @@ export const router = createBrowserRouter([
   {
     path: ROUTES.ADMIN.BASE,
     element: <AdminLayout />,
-    children: [{}],
+    children: [
+      { index: true, element: <Dashboard /> },
+      {
+        path: "*",
+        element: <NotFound />,
+      },
+      {
+        path: ROUTES.ADMIN.CHILDREN.PRODUCTS,
+        element: <Products />,
+      },
+      {
+        path: ROUTES.ADMIN.CHILDREN.ORDERS,
+        element: <Orders />,
+      },
+      {
+        path: ROUTES.ADMIN.CHILDREN.USERS,
+        element: <UserManagement />,
+      },
+      {
+        path: ROUTES.ADMIN.CHILDREN.ANALYTICS,
+        element: <Analytics />,
+      },
+    ],
   },
   {
     element: <RejectRoute />,
