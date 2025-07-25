@@ -26,3 +26,10 @@ export function getIdFromNameId(nameId: string) {
   const arr = nameId.split("-i.");
   return arr[arr.length - 1];
 }
+
+export const formatPrice = (price: number) => {
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(price);
+};

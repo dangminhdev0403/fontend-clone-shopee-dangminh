@@ -5,6 +5,7 @@ import Login from "@components/Login";
 import Register from "@components/Register";
 import ProtectedRoute from "@components/RouteGuards/ProtectedRoute";
 import RejectRoute from "@components/RouteGuards/RejectRoute";
+import AdminLayout from "@layouts/AdminLayout";
 import Auth from "@pages/Auth";
 import CheckOutPage from "@pages/CheckOut";
 import NotFound from "@pages/Errors/NotFound";
@@ -48,7 +49,11 @@ export const router = createBrowserRouter([
       },
     ],
   },
-
+  {
+    path: ROUTES.ADMIN.BASE,
+    element: <AdminLayout />,
+    children: [{}],
+  },
   {
     element: <RejectRoute />,
     children: [

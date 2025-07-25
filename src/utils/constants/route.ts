@@ -7,4 +7,11 @@ export const ROUTES = {
   CART: "/cart",
   CHECKOUT: "/checkout",
   ORDER_HISTORY: "/order-history",
+  ADMIN: {
+    BASE: "/admin",
+    DASHBOARD: "/dashboard",
+    PRODUCTS: "/products",
+    ORDERS: "/orders",
+    USERS: "/users",
+  },
 };
