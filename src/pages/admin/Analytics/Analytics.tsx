@@ -49,6 +49,12 @@ const cards = [
     icon: "📦",
   },
   {
+    title: "Giá trị đơn hàng TB",
+    value: "$97.92",
+    description: "Giá trị trung bình mỗi đơn hàng",
+    icon: "📊",
+  },
+  {
     title: "Người dùng mới",
     value: "330",
     description: "Số lượng người dùng mới trong kỳ",
@@ -65,12 +71,6 @@ const cards = [
     value: "450",
     description: "Tổng số khách hàng đã đăng ký",
     icon: "👥",
-  },
-  {
-    title: "Giá trị đơn hàng TB",
-    value: "$97.92",
-    description: "Giá trị trung bình mỗi đơn hàng",
-    icon: "📊",
   },
 ];
 
