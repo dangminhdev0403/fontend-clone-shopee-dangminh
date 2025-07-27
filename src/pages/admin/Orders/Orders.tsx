@@ -1,9 +1,8 @@
 "use client";
 
-import { AddCircleOutline, Delete, Edit, Search } from "@mui/icons-material";
+import { AddCircleOutline, Delete, Edit } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import {
-  Autocomplete,
   Box,
   Button,
   ButtonGroup,
@@ -14,6 +13,7 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
+  MenuItem,
   Slide,
   TextField,
   ThemeProvider,
@@ -209,7 +209,6 @@ export default function Orders() {
   const shippedOrders = orders.filter(
     (order) => order.status === "Shipped",
   ).length;
-  const paidOrders = orders.filter((order) => order.status === "Paid").length;
   const unfulfilledOrders = orders.filter(
     (order) => order.status === "Unfulfilled",
   ).length;
@@ -337,9 +336,6 @@ export default function Orders() {
   ];
 
   // Tùy chọn cho Autocomplete
-  const customerOptions = Array.from(
-    new Set(orders.map((order) => order.customer)),
-  );
 
   return (
     <ThemeProvider theme={theme}>
@@ -354,26 +350,14 @@ export default function Orders() {
         >
           <h1 className="text-2xl font-semibold">Quản lý Đơn hàng</h1>
           <Box display="flex" gap={2} flexWrap="wrap">
-            <Autocomplete
-              options={customerOptions}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  variant="outlined"
-                  size="small"
-                  placeholder="Tìm kiếm khách hàng..."
-                  InputProps={{
-                    ...params.InputProps,
-                    startAdornment: (
-                      <Search sx={{ color: "action.active", mr: 1 }} />
-                    ),
-                  }}
-                />
-              )}
+            <TextField
+              variant="outlined"
+              size="small"
+              placeholder="Tìm kiếm khách hàng..."
+              onChange={(e) => setSearchTerm(e.target.value)}
               value={searchTerm}
-              onChange={(_, value) => setSearchTerm(value || "")}
-              sx={{ minWidth: 200 }}
             />
+
             <ButtonGroup variant="outlined" size="small">
               <Button
                 variant={filterStatus === "all" ? "contained" : "outlined"}
@@ -470,11 +454,7 @@ export default function Orders() {
         </div>
 
         {/* Dialog thêm/sửa đơn hàng */}
-        <Dialog
-          open={openAddEditDialog}
-          onClose={handleCloseAddEditDialog}
-          TransitionComponent={Transition}
-        >
+        <Dialog open={openAddEditDialog} onClose={handleCloseAddEditDialog}>
           <DialogTitle>
             {currentOrder ? "Sửa Đơn hàng" : "Thêm Đơn hàng mới"}
           </DialogTitle>
@@ -581,7 +561,6 @@ export default function Orders() {
         <Dialog
           open={openConfirmDeleteDialog}
           onClose={handleCloseConfirmDeleteDialog}
-          TransitionComponent={Transition}
         >
           <DialogTitle>Xác nhận xóa</DialogTitle>
           <DialogContent>
