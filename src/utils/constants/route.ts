@@ -23,7 +23,7 @@ export const ROUTES = {
       PRODUCTS: "/admin/products",
       ORDERS: "/admin/orders",
       USERS: "/admin/users",
-      SETTING: "/admin/users",
+      SETTING: "/admin/settings",
       ANALYTICS: "/admin/analytics",
     },
   },

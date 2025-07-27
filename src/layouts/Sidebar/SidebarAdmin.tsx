@@ -83,9 +83,7 @@ export function SidebarAdmin({
       path: ROUTES.ADMIN.ABS.SETTING,
     },
   ];
-  const switchRole = (role: "admin" | "super-admin") => {
-    setUser({ role });
-  };
+
   const handleNavigate = (path: string) => {
     onNavigate(path);
   };
@@ -140,11 +138,11 @@ export function SidebarAdmin({
 
         {/* Navigation */}
         <nav className="flex-1 space-y-2 overflow-y-auto p-4">
-          {menuItems.map((item, index) => (
+          {menuItems.map((item) => (
             <div key={item.id} className="group relative">
               <button
                 onClick={() => handleNavigate(item.path)}
-                className={`group relative flex w-full items-center space-x-4 overflow-hidden rounded-2xl px-4 py-4 transition-all duration-300 ${
+                className={`group relative flex w-full cursor-pointer items-center space-x-4 overflow-hidden rounded-2xl px-4 py-4 transition-all duration-300 ${
                   currentPath === item.path
                     ? `bg-gradient-to-r ${item.gradient} scale-105 transform text-white shadow-xl`
                     : "text-gray-600 hover:scale-102 hover:bg-gray-100/80 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800/50 dark:hover:text-white"
@@ -179,22 +177,6 @@ export function SidebarAdmin({
             </div>
           ))}
         </nav>
-
-        {/* Role Switcher */}
-        <div className="border-t border-gray-200/50 p-4 dark:border-gray-700/50">
-          <div className="relative">
-            <select
-              value={user?.role || "admin"}
-              onChange={(e) =>
-                switchRole(e.target.value as "admin" | "super-admin")
-              }
-              className="w-full cursor-pointer appearance-none rounded-2xl border-0 bg-gradient-to-r from-gray-50 to-gray-100 px-4 py-3 transition-all duration-300 hover:shadow-lg dark:from-gray-800 dark:to-gray-700"
-            >
-              <option value="admin">👤 Admin Mode</option>
-              <option value="super-admin">👑 Super Admin Mode</option>
-            </select>
-          </div>
-        </div>
       </div>
     </div>
   );

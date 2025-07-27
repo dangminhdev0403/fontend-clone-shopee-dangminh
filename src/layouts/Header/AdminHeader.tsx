@@ -4,7 +4,6 @@ import {
   Menu,
   MessageSquare,
   Moon,
-  Search,
   Sparkles,
   Sun,
   X,
@@ -36,21 +35,6 @@ export default function AdminHeader({
               <Menu className="h-5 w-5" />
             )}
           </button>
-
-          {/* Search bar */}
-          <div className="group relative hidden md:block">
-            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400 group-hover:text-orange-500" />
-            <input
-              type="text"
-              placeholder="Tìm kiếm... (Ctrl+K)"
-              className="w-96 rounded-xl border-0 bg-gray-50/80 py-2 pr-20 pl-10 transition-all duration-300 hover:shadow-lg focus:ring-2 focus:ring-orange-500 dark:bg-gray-800/50"
-            />
-            <div className="absolute top-1/2 right-3 -translate-y-1/2 transform">
-              <span className="inline-flex items-center rounded border border-gray-200 px-2 py-1 text-xs">
-                ⌘K
-              </span>
-            </div>
-          </div>
         </div>
 
         {/* Right side */}

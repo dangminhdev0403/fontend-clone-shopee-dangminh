@@ -1,3 +1,3 @@
-import { Orders } from "@pages/admin/Orders/Orders";
+import Orders from "@pages/admin/Orders/Orders";
 
 export default Orders;
