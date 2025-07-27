@@ -1,11 +1,6 @@
 import {
   Box,
-  Card,
-  CardContent,
-  CardHeader,
-  CircularProgress,
   createTheme,
-  Grid,
   Switch,
   ThemeProvider,
   Typography,
@@ -368,27 +363,38 @@ export default function Analytics() {
 
         {/* Biểu đồ */}
         {isLoading ? (
-          <Box
-            display="flex"
-            justifyContent="center"
-            sx={{ my: { xs: 2, sm: 3, md: 4 } }}
-          >
-            <CircularProgress />
-          </Box>
+          <div className="my-6 flex justify-center">
+            <svg
+              className="h-6 w-6 animate-spin text-blue-600"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              />
+            </svg>
+          </div>
         ) : (
-          <Grid container spacing={3}>
-            <Grid item xs={12} lg={7}>
-              <Card sx={{ p: 3, height: "100%" }}>
-                <CardHeader
-                  title="Doanh thu hàng tháng"
-                  titleTypographyProps={{
-                    variant: "h6",
-                    color: "text.primary",
-                  }}
-                  sx={{ pb: 2 }}
-                />
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+            {/* Doanh thu hàng tháng */}
+            <div className="lg:col-span-7">
+              <div className="h-full rounded-xl bg-white p-4 shadow-md dark:bg-gray-900">
+                <h2 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
+                  Doanh thu hàng tháng
+                </h2>
+                <div className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
                     <LineChart
                       data={filteredMonthlySalesData}
                       margin={{ top: 10, right: 30, left: 20, bottom: 5 }}
@@ -417,34 +423,30 @@ export default function Analytics() {
                       />
                     </LineChart>
                   </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} lg={5}>
-              <Card sx={{ p: 3, height: "100%" }}>
-                <CardHeader
-                  title="Đơn hàng theo trạng thái"
-                  titleTypographyProps={{
-                    variant: "h6",
-                    color: "text.primary",
-                  }}
-                  sx={{ pb: 2 }}
-                />
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
+                </div>
+              </div>
+            </div>
+
+            {/* Pie đơn hàng */}
+            <div className="lg:col-span-5">
+              <div className="h-full rounded-xl bg-white p-4 shadow-md dark:bg-gray-900">
+                <h2 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
+                  Đơn hàng theo trạng thái
+                </h2>
+                <div className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
                         data={orderStatusData}
                         cx="50%"
                         cy="50%"
-                        labelLine={true}
+                        labelLine
                         label={({ name, percent }) =>
                           `${name}: ${(percent * 100).toFixed(0)}%`
                         }
                         outerRadius={100}
                         dataKey="value"
                         animationDuration={1000}
-                        labelStyle={{ fontSize: "0.75rem" }}
                       >
                         {orderStatusData.map((entry, index) => (
                           <Cell
@@ -465,21 +467,18 @@ export default function Analytics() {
                       <Legend wrapperStyle={{ fontSize: "0.75rem" }} />
                     </PieChart>
                   </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12}>
-              <Card sx={{ p: 3, height: "100%" }}>
-                <CardHeader
-                  title="Tăng trưởng người dùng"
-                  titleTypographyProps={{
-                    variant: "h6",
-                    color: "text.primary",
-                  }}
-                  sx={{ pb: 2 }}
-                />
-                <CardContent>
-                  <ResponsiveContainer width="100%" height={300}>
+                </div>
+              </div>
+            </div>
+
+            {/* Tăng trưởng người dùng */}
+            <div className="col-span-12">
+              <div className="h-full rounded-xl bg-white p-4 shadow-md dark:bg-gray-900">
+                <h2 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
+                  Tăng trưởng người dùng
+                </h2>
+                <div className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
                     <LineChart
                       data={filteredUserGrowthData}
                       margin={{ top: 10, right: 30, left: 20, bottom: 5 }}
@@ -508,10 +507,10 @@ export default function Analytics() {
                       />
                     </LineChart>
                   </ResponsiveContainer>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </Box>
     </ThemeProvider>
