@@ -1,6 +1,7 @@
 import { rootApi } from "@redux/api/rootApi";
 import { actionHandlerMiddleware } from "@redux/middleware/middleware";
 import { authReducer } from "@redux/slices/authSlice";
+import { cartReducer } from "@redux/slices/cartSlice";
 import { checkoutReducer } from "@redux/slices/checkoutSlice";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { createPersistedReducer } from "@utils/redux/persistReducerHelper";
@@ -16,11 +17,10 @@ import {
 
 // Kết hợp các reducer
 const rootReducer = combineReducers({
-  // Persist riêng cho authReducer
   auth: createPersistedReducer("auth", authReducer),
   checkout: createPersistedReducer("checkout", checkoutReducer),
-
   // Không persist api reducer (thường không nên lưu cache vào localStorage)
+  cart: cartReducer,
   [rootApi.reducerPath]: rootApi.reducer,
 });
 

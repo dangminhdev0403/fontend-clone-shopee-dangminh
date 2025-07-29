@@ -1,5 +1,4 @@
 import {
-  Button,
   Card,
   CardContent,
   Checkbox,
@@ -60,11 +59,6 @@ const CartItem = ({
               >
                 {item.product.name}
               </Typography>
-              <div className="flex flex-wrap items-center gap-2">
-                <Button size="small" className="text-xs text-gray-500">
-                  Yêu thích
-                </Button>
-              </div>
             </div>
           </div>
 

@@ -56,9 +56,7 @@ export default function DropdownMenu<T extends HasId>({
                   +{items.length - 5} sản phẩm khác
                 </span>
               ) : (
-                <span className="text-sm text-gray-500">
-                  Không có sản phẩm nào
-                </span>
+                <span className="text-sm text-gray-500">Không có sản phẩm</span>
               )}
             </div>
             <Button

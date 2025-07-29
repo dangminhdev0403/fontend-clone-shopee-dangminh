@@ -23,6 +23,7 @@ export const API_ROUTES = {
     GET: `${version}/products/get-cart`,
     ADD: `${version}/products/add-to-cart`,
     REMOVE: `${version}/products/remove-from-cart`,
+    REMOVE_LIST: `${version}/products/remove-list-from-cart`,
   },
   ADDRESS: {
     PROVINCES: `${apiLocation}/master-data/province`,

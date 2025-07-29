@@ -7,12 +7,15 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useAddToCartMutation } from "@redux/api/cartApi";
+import { cartSilice } from "@redux/slices/cartSlice";
 import productApi from "@service/product.service";
 import { useQuery } from "@tanstack/react-query";
+import { ROUTES } from "@utils/constants/route";
 import { formatNumber, getIdFromNameId } from "@utils/helper";
 import DOMPurify from "dompurify";
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router";
+import { useDispatch } from "react-redux";
+import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
 
 interface ProductImage {
@@ -29,14 +32,14 @@ const ProductDetail = () => {
     queryKey: ["product", id],
     queryFn: () => productApi.getProductDetail(id),
   });
-
+  const navigate = useNavigate();
   const [isActive, setIsActive] = useState<number | undefined>(undefined);
   const [isImageUrl, setIsImageUrl] = useState<string | undefined>(undefined);
   const imageRef = useRef<HTMLImageElement>(null);
   const [quantity, setQuantity] = useState<number>(1); // set mặc định
 
   const [addToCart] = useAddToCartMutation();
-
+  const dispatch = useDispatch();
   useEffect(() => {
     if (productDetailData?.images?.length) {
       setIsActive(productDetailData.images[0].id);
@@ -102,6 +105,22 @@ const ProductDetail = () => {
         // Handle error, e.g., show an error message
         console.log(error);
 
+        toast.error(` ${error.data.message}`);
+      });
+  };
+  const handleBuyNow = (id: string) => {
+    addToCart({ productId: parseInt(id), quantity, action: "INCREASE" })
+      .unwrap()
+      .then(() => {
+        dispatch(cartSilice.actions.addItemToCart({ id: parseInt(id) }));
+        // Handle success, e.g., navigate
+        navigate(ROUTES.CART);
+
+        toast.success("Mua ngay thành công");
+      })
+      .catch((error) => {
+        // Handle error, e.g., show an error message
+        console.log(error);
         toast.error(` ${error.data.message}`);
       });
   };
@@ -211,6 +230,7 @@ const ProductDetail = () => {
               <button
                 title="Buy Now"
                 className="cursor-pointer border border-amber-500 bg-[#f05d40] p-3 text-white"
+                onClick={() => handleBuyNow(productDetailData?.id)}
               >
                 Mua ngay
               </button>

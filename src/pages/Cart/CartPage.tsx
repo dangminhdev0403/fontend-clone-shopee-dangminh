@@ -1,5 +1,6 @@
 "use client";
 
+import { ConfirmDialog } from "@components/Dialog";
 import {
   Badge,
   Button,
@@ -16,18 +17,19 @@ import {
   CartDetailDTO,
   useAddToCartMutation,
   useRemoveFromCartMutation,
+  useRemoveListFromCartMutation,
 } from "@redux/api/cartApi";
+import { cartSilice } from "@redux/slices/cartSlice";
 import { checkoutSlice } from "@redux/slices/checkoutSlice";
 import { RootState } from "@redux/store";
 import { ROUTES } from "@utils/constants/route";
 import {
   Delete,
-  Heart,
   OptionIcon as LocalOffer,
   ShoppingBag,
   ShoppingCart,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
@@ -52,8 +54,30 @@ export default function CartPage() {
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [selectAll, setSelectAll] = useState(false);
   const [voucherCode, setVoucherCode] = useState("");
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   const [addToCart, { isLoading }] = useAddToCartMutation();
   const [removeFromCart] = useRemoveFromCartMutation();
+  const [removeListFromCart] = useRemoveListFromCartMutation();
+  const selectedProductIdStore = useSelector(
+    (state: RootState) => state.cart.selectedProductId,
+  );
+  const cartDetails = cart.cartDetails || [];
+  const selectedItem = cartDetails.find(
+    (item) => item.id === selectedProductIdStore,
+  );
+  const otherItems = [...cartDetails]
+    .reverse()
+    .filter((item) => item.id !== selectedProductIdStore);
+  useEffect(() => {
+    if (selectedProductIdStore != null) {
+      const idSlected = cart.cartDetails
+        .filter((item) => item.product.id === selectedProductIdStore)
+        .map((item) => item.id);
+      setSelectedItems(idSlected);
+      dispatch(cartSilice.actions.clearSelectedProduct());
+    }
+  }, [cart.cartDetails, dispatch, selectedProductIdStore]);
 
   const handleSelectAll = (checked: boolean) => {
     setSelectAll(checked);
@@ -91,10 +115,25 @@ export default function CartPage() {
   };
 
   const handleRemoveItem = (id: number) => {
-    console.log(`Removing item with ID: ${id}`);
     removeFromCart({ productId: id });
   };
-
+  const handleRemoveItems = () => {
+    removeListFromCart({ ids: selectedItems });
+    setSelectedItems([]);
+    setSelectAll(false);
+    setConfirmOpen(false);
+    toast.success("Đã xóa sản phẩm khỏi giỏ hàng.");
+  };
+  const openConfirmDialog = () => {
+    if (selectedItems.length === 0) {
+      toast.error("Vui lòng chọn ít nhất một sản phẩm để xóa.");
+      return;
+    }
+    setConfirmOpen(true);
+  };
+  const handleCancelDelete = () => {
+    setConfirmOpen(false);
+  };
   const formatPrice = (price: number) =>
     new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -176,7 +215,21 @@ export default function CartPage() {
 
             {/* Cart Items */}
             <div className="space-y-4">
-              {(cart.cartDetails || []).map((item) => (
+              {/* Nếu có sản phẩm được chọn bởi "Mua ngay", render nó trước */}
+              {selectedItem && (
+                <CartItem
+                  key={selectedItem.id}
+                  item={selectedItem}
+                  selected={selectedItems.includes(selectedItem.id)}
+                  onSelect={handleSelectItem}
+                  onQuantityChange={handleQuantityChange}
+                  onRemove={handleRemoveItem}
+                  formatPrice={formatPrice}
+                />
+              )}
+
+              {/* Render phần còn lại */}
+              {otherItems.map((item) => (
                 <CartItem
                   key={item.id}
                   item={item}
@@ -231,15 +284,13 @@ export default function CartPage() {
                         Chọn tất cả ({cart.cartDetails.length})
                       </Typography>
                     </div>
-                    <Button size="small" color="error" startIcon={<Delete />}>
-                      Xóa
-                    </Button>
                     <Button
                       size="small"
-                      startIcon={<Heart />}
-                      className="text-pink-500"
+                      color="error"
+                      startIcon={<Delete />}
+                      onClick={openConfirmDialog}
                     >
-                      Lưu vào đã thích
+                      Xóa
                     </Button>
                   </div>
 
@@ -319,6 +370,12 @@ export default function CartPage() {
           </Fab>
         )}
       </div>
+      <ConfirmDialog
+        confirmOpen={confirmOpen}
+        handleCancelDelete={handleCancelDelete}
+        handleRemoveItems={handleRemoveItems}
+        selectedItems={selectedItems}
+      />
     </div>
   );
 }
